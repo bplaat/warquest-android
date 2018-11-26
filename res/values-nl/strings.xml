@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WarQuest</string>
+    <string name="settings">Instellingen</string>
+    <string name="username_label">Login gebruikersnaam</string>
+    <string name="password_label">Login wachtwoord</string>
+    <string name="zoom_label">Zoom inschakelen</string>
+    <string name="save_button">Opslaan en herlogin</string>
+    <string name="about">Deze applicatie is gemaakt door Bastiaan van der Plaat maar WarQuest is gemaakt door Willem van der Plaat</string>
+</resources>
