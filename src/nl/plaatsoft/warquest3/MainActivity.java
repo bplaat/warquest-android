@@ -15,17 +15,21 @@ import java.util.HashMap;
 
 public class MainActivity extends Activity {
     private WebView webView;
-    protected void onCreate(Bundle savedInstanceState) {
+
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout.activity_main);
+
         ((ImageView)findViewById(R.id.settings_button)).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             }
         });
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         webView = (WebView)findViewById(R.id.webview);
         webView.setBackgroundColor(android.R.color.transparent);
+
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setLoadWithOverviewMode(true);
@@ -34,12 +38,14 @@ public class MainActivity extends Activity {
             webSettings.setBuiltInZoomControls(true);
             webSettings.setDisplayZoomControls(false);
         }
+
         TextView headerTitle = (TextView)findViewById(R.id.header_title);
         webView.setWebChromeClient(new WebChromeClient() {
             public void onReceivedTitle(WebView view, String title) {
                 headerTitle.setText(title);
             }
         });
+
         HashMap<String, String> headers = new HashMap<String, String>();
         String username = preferences.getString("username", null);
         String password = preferences.getString("password", null);
@@ -59,10 +65,12 @@ public class MainActivity extends Activity {
         headers.put("password", password);
         webView.loadUrl("https://www.warquest.nl/", headers);
     }
-    protected void onPause() {
+
+    public void onPause() {
         super.onPause();
         webView.clearHistory();
     }
+
     public void onBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack();

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">WarQuest</string>
     <string name="settings">Instellingen</string>
     <string name="username_label">Login gebruikersnaam</string>
     <string name="password_label">Login wachtwoord</string>
