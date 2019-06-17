@@ -13,15 +13,15 @@ If you don't want to use the Google Play store, you can always download the late
 ## Screenshots
 Here are some screenshots I took from my phone:
 
-[<img alt="Screenshot 1" src="screenshots/screenshot1.png" width="160">](screenshots/screenshot1.png)
-[<img alt="Screenshot 2" src="screenshots/screenshot2.png" width="160">](screenshots/screenshot2.png)
-[<img alt="Screenshot 3" src="screenshots/screenshot3.png" width="160">](screenshots/screenshot3.png)
-[<img alt="Screenshot 4" src="screenshots/screenshot4.png" width="160">](screenshots/screenshot4.png)
+[<img alt="Screenshot 1" src="screenshots/screenshot1_small.png" width="160">](screenshots/screenshot1.png)
+[<img alt="Screenshot 2" src="screenshots/screenshot2_small.png" width="160">](screenshots/screenshot2.png)
+[<img alt="Screenshot 3" src="screenshots/screenshot3_small.png" width="160">](screenshots/screenshot3.png)
+[<img alt="Screenshot 4" src="screenshots/screenshot4_small.png" width="160">](screenshots/screenshot4.png)
 
-[<img alt="Screenshot 5" src="screenshots/screenshot5.png" width="160">](screenshots/screenshot5.png)
-[<img alt="Screenshot 6" src="screenshots/screenshot6.png" width="160">](screenshots/screenshot6.png)
-[<img alt="Screenshot 7" src="screenshots/screenshot7.png" width="160">](screenshots/screenshot7.png)
-[<img alt="Screenshot 8" src="screenshots/screenshot8.png" width="160">](screenshots/screenshot8.png)
+[<img alt="Screenshot 5" src="screenshots/screenshot5_small.png" width="160">](screenshots/screenshot5.png)
+[<img alt="Screenshot 6" src="screenshots/screenshot6_small.png" width="160">](screenshots/screenshot6.png)
+[<img alt="Screenshot 7" src="screenshots/screenshot7_small.png" width="160">](screenshots/screenshot7.png)
+[<img alt="Screenshot 8" src="screenshots/screenshot8_small.png" width="160">](screenshots/screenshot8.png)
 
 ## License
 Copyright (c) Bastiaan van der Plaat
