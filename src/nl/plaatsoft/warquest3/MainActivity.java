@@ -63,7 +63,7 @@ public class MainActivity extends Activity {
         }
         headers.put("username", username);
         headers.put("password", password);
-        webView.loadUrl("https://www.warquest.nl/", headers);
+        webView.loadUrl("https://warquest.plaatsoft.nl/", headers);
     }
 
     public void onPause() {
