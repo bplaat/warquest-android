@@ -1,10 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">WarQuest</string>
-    <string name="settings">Settings</string>
-    <string name="username_label">Login username</string>
-    <string name="password_label">Login password</string>
-    <string name="zoom_label">Enable zoom</string>
-    <string name="save_button">Save and relogin</string>
-    <string name="about">This application is made by Bastiaan van der Plaat but WarQuest is made by Willem van der Plaat</string>
+
+    <string name="main_disconnected_header">Disconnected</string>
+    <string name="main_disconnected_message">Can\'t connect to the WarQuest server probably because you don\'t have an internet connection, connect to the internet to use this app again</string>
+    <string name="main_disconnected_refresh_button">Refresh</string>
+
+    <string name="register_error_message">Can\'t connect to the WarQuest server</string>
+
+    <string name="rating_alert_title">Rate WarQuest?</string>
+    <string name="rating_alert_message_label">If you like the WarQuest app, please take a moment to rate it. Thanks for your support!</string>
+    <string name="rating_alert_rate_button">Rate</string>
+    <string name="rating_alert_later_button">Later</string>
+    <string name="rating_alert_never_button">Never</string>
+
+    <string name="settings_header_title">Settings</string>
+    <string name="settings_accounts_subtitle">Account Switcher</string>
+    <string name="settings_add_account_button">Add existing WarQuest account</string>
+    <string name="settings_create_account_button">Create new WarQuest account</string>
+    <string name="settings_other_subtitle">Other Settings</string>
+    <string name="settings_zoom_label">Enable zoom</string>
+    <string name="settings_about_label">This application is made by Bastiaan van der Plaat but WarQuest is made by Willem van der Plaat</string>
+    <string name="settings_update_error_message">Can\'t connect to the WarQuest server</string>
+
+    <string name="settings_remove_alert_title">Remove account?</string>
+    <string name="settings_remove_alert_message_label">Do you really want to remove this account?</string>
+    <string name="settings_remove_alert_remove_button">Remove</string>
+    <string name="settings_remove_alert_cancel_button">Cancel</string>
+
+    <string name="account_info_label">Level: %1$d - Exp.: %2$s</string>
+
+    <string name="login_header_title">Login</string>
+    <string name="login_info_label">Enter the username and password of your WarQuest account to add it to the list and use it in the app:</string>
+    <string name="login_username_label">Login username</string>
+    <string name="login_password_label">Login password</string>
+    <string name="login_login_button">Login</string>
+    <string name="login_create_label">If you don\'t have an account or if you want to create a new account, press then the create button on the previous page</string>
+    <string name="login_failed_message">Wrong username and / or password</string>
+    <string name="login_banned_message">This player is banned</string>
+    <string name="login_error_message">Can\'t connect to the WarQuest server</string>
 </resources>

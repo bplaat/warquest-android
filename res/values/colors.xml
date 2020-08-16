@@ -4,5 +4,7 @@
     <color name="primary_dark_color">#000</color>
     <color name="primary_text_color">#fff</color>
     <color name="secondary_text_color">#888</color>
+    <color name="account_highlight_color">#222</color>
+    <color name="avatar_background">#333</color>
     <color name="background_color">#111</color>
 </resources>

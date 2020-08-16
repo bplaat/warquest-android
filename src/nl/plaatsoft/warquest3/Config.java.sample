@@ -1,0 +1,23 @@
+package nl.plaatsoft.warquest3;
+
+public class Config {
+    private Config() {}
+
+    // The WarQuest root url
+    public static final String WARQUEST_URL = "https://warquest.plaatsoft.nl/";
+
+    // The WarQuest API url (enter your own)
+    public static final String WARQUEST_API_KEY = "";
+
+    // The Gravatar service url
+    public static final String GRAVATAR_URL = "https://www.gravatar.com/avatar/";
+
+    // The accounts list update timeout (in ms)
+    public static final int ACCOUNTS_UPDATE_TIMEOUT = 30 * 1000;
+
+    // The rating alert launches until prompt
+    public static final int RATING_ALERT_LAUNCHES_UNTIL_PROMPT = 5;
+
+    // The rating alert time until prompt (in ms)
+    public static final int RATING_ALERT_TIME_UNTIL_PROMPT = 2 * 24 * 60 * 60 * 1000;
+}
