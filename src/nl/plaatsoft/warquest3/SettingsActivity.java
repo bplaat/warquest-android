@@ -79,7 +79,7 @@ public class SettingsActivity extends Activity implements FetchDataTask.OnLoadLi
                 // Create new account button
                 if (position == accountsAdapter.getCount() - 1) {
                     // Send register request
-                    FetchDataTask.fetchData(SettingsActivity.this, Config.WARQUEST_URL + "api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, new FetchDataTask.OnLoadListener() {
+                    FetchDataTask.fetchData(SettingsActivity.this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, new FetchDataTask.OnLoadListener() {
                         public void onLoad(String response) {
                             try {
                                 // Parse response
@@ -194,7 +194,7 @@ public class SettingsActivity extends Activity implements FetchDataTask.OnLoadLi
                 // When no accounts are left create new own
                 if (jsonAccounts.length() == 0) {
                     // Send register request
-                    FetchDataTask.fetchData(this, Config.WARQUEST_URL + "api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, new FetchDataTask.OnLoadListener() {
+                    FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, new FetchDataTask.OnLoadListener() {
                         public void onLoad(String response) {
                             try {
                                 // Parse response
@@ -295,7 +295,7 @@ public class SettingsActivity extends Activity implements FetchDataTask.OnLoadLi
             }
 
             // Create request url
-            String url = Config.WARQUEST_URL + "api/players?key=" + Config.WARQUEST_API_KEY;
+            String url = Config.WARQUEST_URL + "/api/players?key=" + Config.WARQUEST_API_KEY;
             try {
                 for (int i = 0; i < jsonAccounts.length(); i++) {
                     Account account = Account.fromJson(jsonAccounts.getJSONObject(i));

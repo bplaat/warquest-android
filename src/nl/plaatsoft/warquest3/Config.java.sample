@@ -4,7 +4,7 @@ public class Config {
     private Config() {}
 
     // The WarQuest root url
-    public static final String WARQUEST_URL = "https://warquest.plaatsoft.nl/";
+    public static final String WARQUEST_URL = "https://warquest.plaatsoft.nl";
 
     // The WarQuest API url (enter your own)
     public static final String WARQUEST_API_KEY = "";

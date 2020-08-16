@@ -35,7 +35,7 @@ public class LoginActivity extends Activity implements FetchDataTask.OnLoadListe
                 // Create request url
                 String url = null;
                 try {
-                    url = Config.WARQUEST_URL + "api/auth/login?key=" + Config.WARQUEST_API_KEY +
+                    url = Config.WARQUEST_URL + "/api/auth/login?key=" + Config.WARQUEST_API_KEY +
                         "&username=" + URLEncoder.encode(usernameInput.getText().toString(), "UTF-8") +
                         "&password=" + URLEncoder.encode(passwordInput.getText().toString(), "UTF-8");
                 } catch (Exception exception) {

@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
         ((Button)findViewById(R.id.main_disconnected_refresh_button)).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 // Refresh the webview
-                loadWebview(Config.WARQUEST_URL);
+                loadWebview(Config.WARQUEST_URL + "/");
             }
         });
 
@@ -70,18 +70,26 @@ public class MainActivity extends Activity {
         TextView headerTitle = (TextView)findViewById(R.id.main_header_title);
         webview.setWebChromeClient(new WebChromeClient() {
             public void onReceivedTitle(WebView view, String title) {
+                // Filter weird Android bug out
+                if (title.equals(Config.WARQUEST_URL)) {
+                    return;
+                }
+
+                // Check if the disconnected page must bee soon
                 if (title.equals("about:blank")) {
-                    webview.clearHistory();
                     headerTitle.setText("WarQuest");
+                    webview.clearHistory();
                     webview.setVisibility(View.GONE);
                     disconnectedPage.setVisibility(View.VISIBLE);
                 }
 
+                // Else just load normal and set title
                 else {
                     headerTitle.setText(title);
 
                     // Check if the webview is hidden
                     if (disconnectedPage.getVisibility() == View.VISIBLE) {
+                        webview.clearHistory();
                         webview.setVisibility(View.VISIBLE);
                         disconnectedPage.setVisibility(View.GONE);
                     }
@@ -138,7 +146,7 @@ public class MainActivity extends Activity {
                 }
 
                 // Load the webview
-                loadWebview(Config.WARQUEST_URL);
+                loadWebview(Config.WARQUEST_URL + "/");
             }
         }
 
@@ -191,7 +199,7 @@ public class MainActivity extends Activity {
                     }
 
                     // Reload webview
-                    loadWebview(Config.WARQUEST_URL);
+                    loadWebview(Config.WARQUEST_URL + "/");
                 }
 
                 // When there is an error reading the accounts json create a new account
@@ -221,7 +229,7 @@ public class MainActivity extends Activity {
 
     // Create a new account and open the webview
     private void createNewAccountAndOpen() {
-        FetchDataTask.fetchData(this, Config.WARQUEST_URL + "api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, new FetchDataTask.OnLoadListener() {
+        FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, new FetchDataTask.OnLoadListener() {
             public void onLoad(String response) {
                 try {
                     JSONObject jsonResponse = new JSONObject(response);
@@ -240,7 +248,7 @@ public class MainActivity extends Activity {
                         settingsEditor.apply();
 
                         // Reload the webview
-                        loadWebview(Config.WARQUEST_URL);
+                        loadWebview(Config.WARQUEST_URL + "/");
                         return;
                     }
                 } catch (Exception exception) {
