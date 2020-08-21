@@ -21,12 +21,16 @@
         <TextView android:id="@+id/account_nickname_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp" />
+            android:layout_marginBottom="4dp"
+            android:singleLine="true"
+            android:ellipsize="end" />
 
         <TextView android:id="@+id/account_info_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/secondary_text_color" />
+            android:textColor="@color/secondary_text_color"
+            android:singleLine="true"
+            android:ellipsize="end" />
     </LinearLayout>
 
     <ImageView android:id="@+id/account_remove_button"

@@ -32,7 +32,7 @@ public class LoginActivity extends Activity implements FetchDataTask.OnLoadListe
         // Login button handler
         ((Button)findViewById(R.id.login_login_button)).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                // Create request url
+                // Create request url for login request
                 String url = null;
                 try {
                     url = Config.WARQUEST_URL + "/api/auth/login?key=" + Config.WARQUEST_API_KEY +

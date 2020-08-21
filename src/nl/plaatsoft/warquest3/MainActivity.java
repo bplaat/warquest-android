@@ -18,17 +18,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 // The main (webview) activity
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements FetchDataTask.OnLoadListener {
     private static final int OPEN_SETTINGS_ACTIVITY = 1;
 
     private SharedPreferences settings;
     private Account activeAccount;
     private WebView webview;
+
+    // Supress warnings to get deprecated old settings
+    @SuppressWarnings("deprecation")
+    public SharedPreferences getOldSettings() {
+        return android.preference.PreferenceManager.getDefaultSharedPreferences(this);
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,45 +126,77 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Load account
-        try {
-            JSONArray jsonAccounts = new JSONArray(settings.getString("accounts", "[]"));
-
-            // When there are no accounts create new one
-            if (jsonAccounts.length() == 0) {
-                createNewAccountAndOpen();
+        // Convert old settings to new format
+        SharedPreferences oldSettings = getOldSettings();
+        if (oldSettings.contains("username")) {
+            // Create request url for login request
+            String url = null;
+            try {
+                url = Config.WARQUEST_URL + "/api/auth/login?key=" + Config.WARQUEST_API_KEY +
+                    "&username=" + URLEncoder.encode(oldSettings.getString("username", null), "UTF-8") +
+                    "&password=" + URLEncoder.encode(oldSettings.getString("password", null), "UTF-8");
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
 
-            // Else get selected account and load webview
-            else {
-                // Get selected account id
-                long selectedAccountId = settings.getLong("selected_account_id", 0);
-                if (selectedAccountId == 0) {
-                    selectedAccountId = Account.fromJson(jsonAccounts.getJSONObject(0)).getId();
+            // Do login request and save and open
+            FetchDataTask.fetchData(this, url, false, false, this);
+
+            // Set and save old zoom when disabled
+            boolean oldZoom = oldSettings.getBoolean("zoom", true);
+            if (oldZoom == false) {
+                webSettings.setBuiltInZoomControls(false);
+
+                SharedPreferences.Editor settingsEditor = settings.edit();
+                settingsEditor.putBoolean("zoom", false);
+                settingsEditor.apply();
+            }
+        }
+
+        // When no old account convert
+        else {
+            // Load account
+            try {
+                JSONArray jsonAccounts = new JSONArray(settings.getString("accounts", "[]"));
+
+                // When there are no accounts create new one
+                if (jsonAccounts.length() == 0) {
+                    // Do register request and save and open
+                    FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
                 }
 
-                // Find selected account
-                for (int i = 0; i < jsonAccounts.length(); i++) {
-                    Account account =Account.fromJson(jsonAccounts.getJSONObject(i));
-                    if (account.getId() == selectedAccountId) {
-                        activeAccount = account;
-                        break;
+                // Else get selected account and load webview
+                else {
+                    // Get selected account id
+                    long selectedAccountId = settings.getLong("selected_account_id", 0);
+                    if (selectedAccountId == 0) {
+                        selectedAccountId = Account.fromJson(jsonAccounts.getJSONObject(0)).getId();
                     }
-                }
 
-                // Load the webview
-                loadWebview(Config.WARQUEST_URL + "/");
+                    // Find selected account
+                    for (int i = 0; i < jsonAccounts.length(); i++) {
+                        Account account =Account.fromJson(jsonAccounts.getJSONObject(i));
+                        if (account.getId() == selectedAccountId) {
+                            activeAccount = account;
+                            break;
+                        }
+                    }
+
+                    // Load the webview
+                    loadWebview(Config.WARQUEST_URL + "/");
+                }
+            }
+
+            // When there is an error reading the accounts json create a new account
+            catch (Exception exception) {
+                exception.printStackTrace();
+
+                // Do register request and save and open
+                FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
             }
         }
 
-        // When there is an error reading the accounts json create a new account
-        catch (Exception exception) {
-            exception.printStackTrace();
-
-            createNewAccountAndOpen();
-        }
-
-        // Check rating
+        // Check rating alert
         RatingAlert.check(MainActivity.this);
     }
 
@@ -206,7 +245,8 @@ public class MainActivity extends Activity {
                 catch (Exception exception) {
                     exception.printStackTrace();
 
-                    createNewAccountAndOpen();
+                    // Do register request and save and open
+                    FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
                 }
             }
         }
@@ -227,38 +267,43 @@ public class MainActivity extends Activity {
         }
     }
 
-    // Create a new account and open the webview
-    private void createNewAccountAndOpen() {
-        FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, new FetchDataTask.OnLoadListener() {
-            public void onLoad(String response) {
-                try {
-                    JSONObject jsonResponse = new JSONObject(response);
-                    if (jsonResponse.getBoolean("success")) {
-                        // Set the active account
-                        activeAccount = Account.fromJsonApiResponse(jsonResponse);
+    // Create a new account and open the webview onload
+    public void onLoad(String response) {
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            if (jsonResponse.getBoolean("success")) {
+                // Set the active account
+                activeAccount = Account.fromJsonApiResponse(jsonResponse);
 
-                        // Add account to json accounts
-                        JSONArray jsonAccounts = new JSONArray();
-                        jsonAccounts.put(activeAccount.toJson());
+                // Add account to json accounts
+                JSONArray jsonAccounts = new JSONArray();
+                jsonAccounts.put(activeAccount.toJson());
 
-                        // Save data
-                        SharedPreferences.Editor settingsEditor = settings.edit();
-                        settingsEditor.putString("accounts", jsonAccounts.toString());
-                        settingsEditor.putLong("selected_account_id", activeAccount.getId());
-                        settingsEditor.apply();
+                // Save data
+                SharedPreferences.Editor settingsEditor = settings.edit();
+                settingsEditor.putString("accounts", jsonAccounts.toString());
+                settingsEditor.putLong("selected_account_id", activeAccount.getId());
+                settingsEditor.apply();
 
-                        // Reload the webview
-                        loadWebview(Config.WARQUEST_URL + "/");
-                        return;
-                    }
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+                // Reload the webview
+                loadWebview(Config.WARQUEST_URL + "/");
+
+                // Remove old settings when we where converting
+                SharedPreferences oldSettings = getOldSettings();
+                if (oldSettings.contains("username")) {
+                    SharedPreferences.Editor oldSettingsEditor = oldSettings.edit();
+                    oldSettingsEditor.clear();
+                    oldSettingsEditor.apply();
                 }
 
-                // When an error occurt or success is false show an error message
-                Toast.makeText(MainActivity.this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
+                return;
             }
-        });
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        // When an error occurt or success is false show an error message
+        Toast.makeText(MainActivity.this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
     }
 
     // Load url in webview

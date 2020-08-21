@@ -15,5 +15,7 @@
         android:layout_weight="1"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:gravity="center_vertical" />
+        android:gravity="center_vertical"
+        android:singleLine="true"
+        android:ellipsize="end" />
 </LinearLayout>
