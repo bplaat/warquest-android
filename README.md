@@ -24,6 +24,6 @@ Here are some screenshots I took from my phone:
 [<img alt="Screenshot 8" src="screenshots/screenshot8_small.png" width="160">](screenshots/screenshot8.png)
 
 ## License
-Copyright (c) Bastiaan van der Plaat
+Copyright &copy; 2018 - present Bastiaan van der Plaat
 
 Licensed under the [MIT](LICENSE) license.
