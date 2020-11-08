@@ -17,6 +17,9 @@
     <string name="settings_add_account_button">Voeg een bestaand WarQuest-account toe</string>
     <string name="settings_create_account_button">Maak een nieuw WarQuest-account aan</string>
     <string name="settings_other_subtitle">Andere Instellingen</string>
+    <string name="settings_language_label">Taal</string>
+    <string name="settings_theme_label">Thema</string>
+    <string name="settings_cancel">Annuleren</string>
     <string name="settings_zoom_label">Zoom inschakelen</string>
     <string name="settings_about_label">Deze applicatie is gemaakt door Bastiaan van der Plaat maar WarQuest is gemaakt door Willem van der Plaat</string>
     <string name="settings_update_error_message">Kan geen verbinding maken met de WarQuest server</string>
@@ -37,4 +40,17 @@
     <string name="login_failed_message">Verkeerde gebruikersnaam en / of wachtwoord</string>
     <string name="login_banned_message">Deze speler is verbannen</string>
     <string name="login_error_message">Kan geen verbinding maken met de WarQuest server</string>
+
+
+    <string-array name="languages">
+        <item>English</item>
+        <item>Nederlands</item>
+        <item>Gebruik systeemstandaard</item>
+    </string-array>
+
+    <string-array name="themes">
+        <item>Licht</item>
+        <item>Donker</item>
+        <item>Ingesteld door batterijbesparing</item>
+    </string-array>
 </resources>

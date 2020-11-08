@@ -19,6 +19,9 @@
     <string name="settings_add_account_button">Add existing WarQuest account</string>
     <string name="settings_create_account_button">Create new WarQuest account</string>
     <string name="settings_other_subtitle">Other Settings</string>
+    <string name="settings_language_label">Language</string>
+    <string name="settings_theme_label">Theme</string>
+    <string name="settings_cancel">Cancel</string>
     <string name="settings_zoom_label">Enable zoom</string>
     <string name="settings_about_label">This application is made by Bastiaan van der Plaat but WarQuest is made by Willem van der Plaat</string>
     <string name="settings_update_error_message">Can\'t connect to the WarQuest server</string>
@@ -39,4 +42,16 @@
     <string name="login_failed_message">Wrong username and / or password</string>
     <string name="login_banned_message">This player is banned</string>
     <string name="login_error_message">Can\'t connect to the WarQuest server</string>
+
+    <string-array name="languages">
+        <item>English</item>
+        <item>Nederlands</item>
+        <item>Use system default</item>
+    </string-array>
+
+    <string-array name="themes">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Set by Battery Saver</item>
+    </string-array>
 </resources>

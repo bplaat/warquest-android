@@ -30,7 +30,7 @@ public class Utils {
     // Get the current locale of the device
     @SuppressWarnings("deprecation")
     public static Locale getCurrentLocale(Context context){
-        if (Build.VERSION.SDK_INT >= 24) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return context.getResources().getConfiguration().getLocales().get(0);
         } else {
             // Suppress deprecation warning for this line:

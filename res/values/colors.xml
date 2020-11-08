@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_color">#222</color>
-    <color name="primary_dark_color">#000</color>
-    <color name="primary_text_color">#fff</color>
-    <color name="secondary_text_color">#888</color>
-    <color name="account_highlight_color">#222</color>
-    <color name="avatar_background">#333</color>
-    <color name="background_color">#111</color>
+    <color name="primary_color">#fff</color>
+    <color name="primary_dark_color">#111</color>
+    <color name="accent_color">#29f</color>
+    <color name="primary_text_color">#111</color>
+    <color name="secondary_text_color">#777</color>
+    <color name="selected_background_color">#eee</color>
+    <color name="loading_background_color">#ddd</color>
+    <color name="background_color">#fff</color>
+    <color name="icon_color">#333</color>
 </resources>

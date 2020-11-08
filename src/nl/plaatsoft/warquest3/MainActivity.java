@@ -1,11 +1,12 @@
 package nl.plaatsoft.warquest3;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Looper;
+import android.os.Handler;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -24,9 +25,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 // The main (webview) activity
-public class MainActivity extends Activity implements FetchDataTask.OnLoadListener {
-    private static final int OPEN_SETTINGS_ACTIVITY = 1;
+public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadListener {
+    private static final int SETTINGS_ACTIVITY_REQUEST_CODE = 1;
 
+    public int oldLanguage = -1;
+    public int oldTheme = -1;
     private SharedPreferences settings;
     private Account activeAccount;
     private WebView webview;
@@ -47,7 +50,9 @@ public class MainActivity extends Activity implements FetchDataTask.OnLoadListen
         // Main settings button handler
         ((ImageView)findViewById(R.id.main_settings_button)).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), OPEN_SETTINGS_ACTIVITY);
+                oldLanguage = settings.getInt("language", SettingsActivity.LANGUAGE_DEFAULT);
+                oldTheme = settings.getInt("theme", SettingsActivity.THEME_DEFAULT);
+                startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), MainActivity.SETTINGS_ACTIVITY_REQUEST_CODE);
             }
         });
 
@@ -211,7 +216,7 @@ public class MainActivity extends Activity implements FetchDataTask.OnLoadListen
     // When the settings activity is closed update stuff
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == OPEN_SETTINGS_ACTIVITY) {
+        if (requestCode == MainActivity.SETTINGS_ACTIVITY_REQUEST_CODE) {
             // Set zoom value
             boolean zoom = settings.getBoolean("zoom", true);
             WebSettings webSettings = webview.getSettings();
@@ -247,6 +252,21 @@ public class MainActivity extends Activity implements FetchDataTask.OnLoadListen
 
                     // Do register request and save and open
                     FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
+                }
+            }
+
+            // Recreate when language or theme change
+            if (oldLanguage != -1 && oldTheme != -1) {
+                if (
+                    oldLanguage != settings.getInt("language", SettingsActivity.LANGUAGE_DEFAULT) ||
+                    oldTheme != settings.getInt("theme", SettingsActivity.THEME_DEFAULT)
+                ) {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            recreate();
+                        }
+                    });
                 }
             }
         }

@@ -12,25 +12,60 @@
         android:fontFamily="sans-serif-medium"
         android:textSize="20sp" />
 
+    <LinearLayout android:id="@+id/settings_language_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:padding="16dp">
+
+        <TextView android:text="@string/settings_language_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView android:id="@+id/settings_language_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/secondary_text_color" />
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/settings_theme_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:padding="16dp">
+
+        <TextView android:text="@string/settings_theme_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView android:id="@+id/settings_theme_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/secondary_text_color" />
+    </LinearLayout>
+
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="24dp"
+        android:padding="16dp">
 
         <TextView android:text="@string/settings_zoom_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/secondary_text_color" />
+            android:layout_weight="1" />
 
         <Switch android:id="@+id/settings_zoom_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <TextView android:text="@string/settings_about_label"
+    <TextView android:id="@+id/settings_about_button"
+        android:text="@string/settings_about_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:textColor="@color/secondary_text_color"
-        android:lineSpacingMultiplier="1.2"
-        android:gravity="center" />
+        android:lineSpacingMultiplier="1.2" />
 </LinearLayout>

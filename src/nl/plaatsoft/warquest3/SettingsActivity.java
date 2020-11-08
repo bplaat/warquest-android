@@ -1,11 +1,14 @@
 package nl.plaatsoft.warquest3;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.view.View;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -13,14 +16,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.net.URLEncoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 // The settings activity
-public class SettingsActivity extends Activity implements FetchDataTask.OnLoadListener {
-    private static final int OPEN_LOGIN_ACTIVITY = 1;
+public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLoadListener {
+    public static final int LANGUAGE_DEFAULT = 2;
+    public static final int THEME_DEFAULT = 2;
+
+    private static final int LOGIN_ACTIVITY_REQUEST_CODE = 1;
 
     private SharedPreferences settings;
     private AccountsAdapter accountsAdapter;
@@ -73,7 +80,7 @@ public class SettingsActivity extends Activity implements FetchDataTask.OnLoadLi
                 // Add existing account button
                 if (position == accountsAdapter.getCount() - 2) {
                     // Open login activity
-                    startActivityForResult(new Intent(SettingsActivity.this, LoginActivity.class), OPEN_LOGIN_ACTIVITY);
+                    startActivityForResult(new Intent(SettingsActivity.this, LoginActivity.class), SettingsActivity.LOGIN_ACTIVITY_REQUEST_CODE);
                 }
 
                 // Create new account button
@@ -145,6 +152,54 @@ public class SettingsActivity extends Activity implements FetchDataTask.OnLoadLi
         accountsAdapter.add(null);
         accountsAdapter.add(null);
 
+        // Settings language selector button
+        String[] languages = getResources().getStringArray(R.array.languages);
+        int language = settings.getInt("language", SettingsActivity.LANGUAGE_DEFAULT);
+        ((TextView)findViewById(R.id.settings_language_label)).setText(languages[language]);
+
+        ((LinearLayout)findViewById(R.id.settings_language_button)).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                new AlertDialog.Builder(SettingsActivity.this)
+                    .setTitle(getResources().getString(R.string.settings_language_label))
+                    .setSingleChoiceItems(languages, language, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences.Editor settingsEditor = settings.edit();
+                            settingsEditor.putInt("language", which);
+                            settingsEditor.apply();
+
+                            dialog.dismiss();
+                            recreate();
+                        }
+                    })
+                    .setNegativeButton(getResources().getString(R.string.settings_cancel), null)
+                    .show();
+            }
+        });
+
+        // Settings theme selector button
+        String[] themes = getResources().getStringArray(R.array.themes);
+        int theme = settings.getInt("theme", SettingsActivity.THEME_DEFAULT);
+        ((TextView)findViewById(R.id.settings_theme_label)).setText(themes[theme]);
+
+        ((LinearLayout)findViewById(R.id.settings_theme_button)).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                new AlertDialog.Builder(SettingsActivity.this)
+                    .setTitle(getResources().getString(R.string.settings_theme_label))
+                    .setSingleChoiceItems(themes, theme, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences.Editor settingsEditor = settings.edit();
+                            settingsEditor.putInt("theme", which);
+                            settingsEditor.apply();
+
+                            dialog.dismiss();
+                            recreate();
+                        }
+                    })
+                    .setNegativeButton(getResources().getString(R.string.settings_cancel), null)
+                    .show();
+            }
+        });
+
         // Zoom switch save code
         Switch zoomSwitch = (Switch)footerView.findViewById(R.id.settings_zoom_switch);
         zoomSwitch.setChecked(settings.getBoolean("zoom", true));
@@ -157,6 +212,13 @@ public class SettingsActivity extends Activity implements FetchDataTask.OnLoadLi
             }
         });
 
+        // Settings about button
+        ((TextView)findViewById(R.id.settings_about_button)).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://bastiaan.ml/")));
+            }
+        });
+
         // Check to update accounts data
         updateAccountsData();
     }
@@ -164,7 +226,7 @@ public class SettingsActivity extends Activity implements FetchDataTask.OnLoadLi
     // When the login page is succesfull add and open account
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == OPEN_LOGIN_ACTIVITY && resultCode == Activity.RESULT_OK) {
+        if (requestCode == SettingsActivity.LOGIN_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             // When the login activity returns an account add and open it
             Account account = (Account)data.getExtras().getSerializable("account");
             addAccount(account);

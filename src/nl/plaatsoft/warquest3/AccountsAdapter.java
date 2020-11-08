@@ -64,7 +64,7 @@ public class AccountsAdapter extends ArrayAdapter<Account> {
 
             // Highlight account button if selected
             if (account.getId() == selectedAccountId) {
-                convertView.setBackgroundResource(R.color.account_highlight_color);
+                convertView.setBackgroundResource(R.color.selected_background_color);
             } else {
                 convertView.setBackgroundResource(0);
             }

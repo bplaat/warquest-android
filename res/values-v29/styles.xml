@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AppBase" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <!-- Make status bar light -->
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/primary_color</item>
+
+        <!-- Make navigation bar light -->
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarColor">@color/primary_color</item>
+
+        <!-- Disable force dark mode -->
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>

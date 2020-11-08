@@ -12,7 +12,7 @@ import java.net.URLEncoder;
 import org.json.JSONObject;
 
 // Login activity
-public class LoginActivity extends Activity implements FetchDataTask.OnLoadListener {
+public class LoginActivity extends BaseActivity implements FetchDataTask.OnLoadListener {
     // Create activity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +27,7 @@ public class LoginActivity extends Activity implements FetchDataTask.OnLoadListe
 
         // Get input fields
         EditText usernameInput = (EditText)findViewById(R.id.login_username_input);
+        usernameInput.requestFocus();
         EditText passwordInput = (EditText)findViewById(R.id.login_password_input);
 
         // Login button handler
