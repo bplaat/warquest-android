@@ -34,6 +34,11 @@ public class AccountsAdapter extends ArrayAdapter<Account> {
        this.selectedAccountId = selectedAccountId;
     }
 
+    public void setSelectedAccountId(long selectedAccountId) {
+        this.selectedAccountId = selectedAccountId;
+        notifyDataSetChanged();
+    }
+
     public View getView(int position, View convertView, ViewGroup parent) {
         Context context = getContext();
 
@@ -70,28 +75,24 @@ public class AccountsAdapter extends ArrayAdapter<Account> {
             }
 
             // Load avatar image async
-            FetchImageTask.fetchImage(context, accountViewHolder.accountAvatarImage, Config.GRAVATAR_URL + Utils.md5(account.getEmail()) + "?s=" + Utils.convertDpToPixel(context, 40) + "&d=mp");
+            new FetchImageTask(context, accountViewHolder.accountAvatarImage, Config.GRAVATAR_URL + Utils.md5(account.getEmail()) + "?s=" + Utils.convertDpToPixel(context, 40) + "&d=mp", true, true);
 
             // Set account labels
             accountViewHolder.accountNicknameLabel.setText(account.getNickname());
             accountViewHolder.accountInfoLabel.setText(context.getResources().getString(R.string.account_info_label, account.getLevel(), NumberFormat.getInstance(Utils.getCurrentLocale(context)).format(account.getExperience())));
 
             // When remove button is clicked
-            accountViewHolder.accountRemoveButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    // Show remove warning alert
-                    new AlertDialog.Builder(context)
-                        .setTitle(R.string.settings_remove_alert_title)
-                        .setMessage(R.string.settings_remove_alert_message_label)
-                        .setPositiveButton(R.string.settings_remove_alert_remove_button, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                // Request account removal at parent activity
-                                ((SettingsActivity)context).removeAccount(position);
-                            }
-                        })
-                        .setNegativeButton(R.string.settings_remove_alert_cancel_button, null)
-                        .show();
-                }
+            accountViewHolder.accountRemoveButton.setOnClickListener((View view) -> {
+                // Show remove warning alert
+                new AlertDialog.Builder(context)
+                    .setTitle(R.string.settings_remove_alert_title)
+                    .setMessage(R.string.settings_remove_alert_message_label)
+                    .setPositiveButton(R.string.settings_remove_alert_remove_button, (DialogInterface dialog, int whichButton) -> {
+                        // Request account removal at parent activity
+                        ((SettingsActivity)context).removeAccount(position);
+                    })
+                    .setNegativeButton(R.string.settings_remove_alert_cancel_button, null)
+                    .show();
             });
         }
 
@@ -110,14 +111,5 @@ public class AccountsAdapter extends ArrayAdapter<Account> {
         }
 
         return convertView;
-    }
-
-    public long getSelectedAccountId() {
-        return selectedAccountId;
-    }
-
-    public void setSelectedAccountId(long selectedAccountId) {
-        this.selectedAccountId = selectedAccountId;
-        notifyDataSetInvalidated();
     }
 }

@@ -21,7 +21,7 @@
     <string name="settings_theme_label">Thema</string>
     <string name="settings_cancel">Annuleren</string>
     <string name="settings_zoom_label">Zoom inschakelen</string>
-    <string name="settings_about_label">Deze applicatie is gemaakt door Bastiaan van der Plaat maar WarQuest is gemaakt door Willem van der Plaat</string>
+    <string name="settings_about_button">Deze applicatie is gemaakt door Bastiaan van der Plaat maar WarQuest is gemaakt door Willem van der Plaat</string>
     <string name="settings_update_error_message">Kan geen verbinding maken met de WarQuest server</string>
 
     <string name="settings_remove_alert_title">Account verwijderen?</string>

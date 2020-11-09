@@ -19,10 +19,8 @@ public class LoginActivity extends BaseActivity implements FetchDataTask.OnLoadL
         setContentView(R.layout.activity_login);
 
         // Login back button handler
-        ((ImageView)findViewById(R.id.login_back_button)).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                finish();
-            }
+        ((ImageView)findViewById(R.id.login_back_button)).setOnClickListener((View view) -> {
+            finish();
         });
 
         // Get input fields
@@ -31,21 +29,19 @@ public class LoginActivity extends BaseActivity implements FetchDataTask.OnLoadL
         EditText passwordInput = (EditText)findViewById(R.id.login_password_input);
 
         // Login button handler
-        ((Button)findViewById(R.id.login_login_button)).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                // Create request url for login request
-                String url = null;
-                try {
-                    url = Config.WARQUEST_URL + "/api/auth/login?key=" + Config.WARQUEST_API_KEY +
-                        "&username=" + URLEncoder.encode(usernameInput.getText().toString(), "UTF-8") +
-                        "&password=" + URLEncoder.encode(passwordInput.getText().toString(), "UTF-8");
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
-
-                // Do request
-                FetchDataTask.fetchData(LoginActivity.this, url, false, false, LoginActivity.this);
+        ((Button)findViewById(R.id.login_login_button)).setOnClickListener((View view) -> {
+            // Create request url for login request
+            String url = null;
+            try {
+                url = Config.WARQUEST_URL + "/api/auth/login?key=" + Config.WARQUEST_API_KEY +
+                    "&username=" + URLEncoder.encode(usernameInput.getText().toString(), "UTF-8") +
+                    "&password=" + URLEncoder.encode(passwordInput.getText().toString(), "UTF-8");
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
+
+            // Do request
+            new FetchDataTask(this, url, false, false, this);
         });
     }
 

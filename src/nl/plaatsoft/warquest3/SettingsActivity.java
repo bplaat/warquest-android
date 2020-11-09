@@ -2,7 +2,6 @@ package nl.plaatsoft.warquest3;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,11 +24,9 @@ import org.json.JSONObject;
 // The settings activity
 public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLoadListener {
     public static final int LANGUAGE_DEFAULT = 2;
-    public static final int THEME_DEFAULT = 2;
-
+    public static final int THEME_DEFAULT = 1;
     private static final int LOGIN_ACTIVITY_REQUEST_CODE = 1;
 
-    private SharedPreferences settings;
     private AccountsAdapter accountsAdapter;
 
     // Create activity
@@ -37,14 +34,9 @@ public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // Load settings
-        settings = getSharedPreferences("settings", Context.MODE_PRIVATE);
-
         // Settings back button
-        ((ImageView)findViewById(R.id.settings_back_button)).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                finish();
-            }
+        ((ImageView)findViewById(R.id.settings_back_button)).setOnClickListener((View view) -> {
+            finish();
         });
 
         // Accounts list view create header and footer views and adapter
@@ -59,82 +51,76 @@ public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLo
         accountsList.setAdapter(accountsAdapter);
 
         // Accounts item click event
-        accountsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                position -= 1;
+        accountsList.setOnItemClickListener((AdapterView<?> adapterView, View view, int position, long id) -> {
+            position -= 1;
 
-                // Normal account button
-                if (position < accountsAdapter.getCount() - 2) {
-                    // Get account
-                    Account account = accountsAdapter.getItem(position);
+            // Normal account button
+            if (position < accountsAdapter.getCount() - 2) {
+                // Get account
+                Account account = accountsAdapter.getItem(position);
 
-                    // Save new selected account id
-                    SharedPreferences.Editor settingsEditor = settings.edit();
-                    settingsEditor.putLong("selected_account_id", account.getId());
-                    settingsEditor.apply();
+                // Save new selected account id
+                SharedPreferences.Editor settingsEditor = settings.edit();
+                settingsEditor.putLong("selected_account_id", account.getId());
+                settingsEditor.apply();
 
-                    // Close activity
-                    finish();
-                }
+                // Close activity
+                finish();
+            }
 
-                // Add existing account button
-                if (position == accountsAdapter.getCount() - 2) {
-                    // Open login activity
-                    startActivityForResult(new Intent(SettingsActivity.this, LoginActivity.class), SettingsActivity.LOGIN_ACTIVITY_REQUEST_CODE);
-                }
+            // Add existing account button
+            if (position == accountsAdapter.getCount() - 2) {
+                // Open login activity
+                startActivityForResult(new Intent(this, LoginActivity.class), SettingsActivity.LOGIN_ACTIVITY_REQUEST_CODE);
+            }
 
-                // Create new account button
-                if (position == accountsAdapter.getCount() - 1) {
-                    // Send register request
-                    FetchDataTask.fetchData(SettingsActivity.this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, new FetchDataTask.OnLoadListener() {
-                        public void onLoad(String response) {
-                            try {
-                                // Parse response
-                                JSONObject jsonResponse = new JSONObject(response);
+            // Create new account button
+            if (position == accountsAdapter.getCount() - 1) {
+                // Send register request
+                new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, (String response) -> {
+                    try {
+                        // Parse response
+                        JSONObject jsonResponse = new JSONObject(response);
 
-                                // When successfull add and open account
-                                if (jsonResponse.getBoolean("success")) {
-                                    Account account = Account.fromJsonApiResponse(jsonResponse);
-                                    addAccount(account);
-                                    openAccount(account);
-                                    return;
-                                }
-                            } catch (Exception exception) {
-                                exception.printStackTrace();
-                            }
-
-                            // When an error occurt or success is false show an error message
-                            Toast.makeText(SettingsActivity.this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
+                        // When successfull add and open account
+                        if (jsonResponse.getBoolean("success")) {
+                            Account account = Account.fromJsonApiResponse(jsonResponse);
+                            addAccount(account);
+                            openAccount(account);
+                            return;
                         }
-                    });
-                }
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+
+                    // When an error occurt or success is false show an error message
+                    Toast.makeText(this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
+                });
             }
         });
 
         // Accounts long press event
-        accountsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                position -= 1;
+        accountsList.setOnItemLongClickListener((AdapterView<?> adapterView, View view, int position, long id) -> {
+            position -= 1;
 
-                // Normal account button when long pressed some extra account information
-                if (position < accountsAdapter.getCount() - 2) {
-                    // Get account
-                    Account account = accountsAdapter.getItem(position);
+            // Normal account button when long pressed some extra account information
+            if (position < accountsAdapter.getCount() - 2) {
+                // Get account
+                Account account = accountsAdapter.getItem(position);
 
-                    // Show toast with extra information
-                    Toast.makeText(
-                        SettingsActivity.this,
-                        "Username: " + account.getUsername() + "\n" +
-                        "Email: " + (account.getEmail().equals("") ? "?" : account.getEmail()) + "\n" +
-                        "Password: " + account.getPassword(),
-                        Toast.LENGTH_LONG
-                    ).show();
+                // Show toast with extra information
+                Toast.makeText(
+                    this,
+                    "Username: " + account.getUsername() + "\n" +
+                    "Email: " + (account.getEmail().equals("") ? "?" : account.getEmail()) + "\n" +
+                    "Password: " + account.getPassword(),
+                    Toast.LENGTH_LONG
+                ).show();
 
-                    return true;
-                }
-
-                return false;
+                return true;
             }
+
+            return false;
         });
 
         // Load accounts from settings
@@ -157,23 +143,19 @@ public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLo
         int language = settings.getInt("language", SettingsActivity.LANGUAGE_DEFAULT);
         ((TextView)findViewById(R.id.settings_language_label)).setText(languages[language]);
 
-        ((LinearLayout)findViewById(R.id.settings_language_button)).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                new AlertDialog.Builder(SettingsActivity.this)
-                    .setTitle(getResources().getString(R.string.settings_language_label))
-                    .setSingleChoiceItems(languages, language, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            SharedPreferences.Editor settingsEditor = settings.edit();
-                            settingsEditor.putInt("language", which);
-                            settingsEditor.apply();
+        ((LinearLayout)findViewById(R.id.settings_language_button)).setOnClickListener((View view) -> {
+            new AlertDialog.Builder(this)
+                .setTitle(getResources().getString(R.string.settings_language_label))
+                .setSingleChoiceItems(languages, language, (DialogInterface dialog, int which) -> {
+                    SharedPreferences.Editor settingsEditor = settings.edit();
+                    settingsEditor.putInt("language", which);
+                    settingsEditor.apply();
 
-                            dialog.dismiss();
-                            recreate();
-                        }
-                    })
-                    .setNegativeButton(getResources().getString(R.string.settings_cancel), null)
-                    .show();
-            }
+                    dialog.dismiss();
+                    recreate();
+                })
+                .setNegativeButton(getResources().getString(R.string.settings_cancel), null)
+                .show();
         });
 
         // Settings theme selector button
@@ -181,42 +163,34 @@ public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLo
         int theme = settings.getInt("theme", SettingsActivity.THEME_DEFAULT);
         ((TextView)findViewById(R.id.settings_theme_label)).setText(themes[theme]);
 
-        ((LinearLayout)findViewById(R.id.settings_theme_button)).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                new AlertDialog.Builder(SettingsActivity.this)
-                    .setTitle(getResources().getString(R.string.settings_theme_label))
-                    .setSingleChoiceItems(themes, theme, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            SharedPreferences.Editor settingsEditor = settings.edit();
-                            settingsEditor.putInt("theme", which);
-                            settingsEditor.apply();
+        ((LinearLayout)findViewById(R.id.settings_theme_button)).setOnClickListener((View view) -> {
+            new AlertDialog.Builder(this)
+                .setTitle(getResources().getString(R.string.settings_theme_label))
+                .setSingleChoiceItems(themes, theme, (DialogInterface dialog, int which) ->  {
+                    SharedPreferences.Editor settingsEditor = settings.edit();
+                    settingsEditor.putInt("theme", which);
+                    settingsEditor.apply();
 
-                            dialog.dismiss();
-                            recreate();
-                        }
-                    })
-                    .setNegativeButton(getResources().getString(R.string.settings_cancel), null)
-                    .show();
-            }
+                    dialog.dismiss();
+                    recreate();
+                })
+                .setNegativeButton(getResources().getString(R.string.settings_cancel), null)
+                .show();
         });
 
         // Zoom switch save code
         Switch zoomSwitch = (Switch)footerView.findViewById(R.id.settings_zoom_switch);
         zoomSwitch.setChecked(settings.getBoolean("zoom", true));
-        zoomSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // Save data when changed
-                SharedPreferences.Editor settingsEditor = settings.edit();
-                settingsEditor.putBoolean("zoom", isChecked);
-                settingsEditor.apply();
-            }
+        zoomSwitch.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked) -> {
+            // Save data when changed
+            SharedPreferences.Editor settingsEditor = settings.edit();
+            settingsEditor.putBoolean("zoom", isChecked);
+            settingsEditor.apply();
         });
 
         // Settings about button
-        ((TextView)findViewById(R.id.settings_about_button)).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://bastiaan.ml/")));
-            }
+        ((TextView)findViewById(R.id.settings_about_button)).setOnClickListener((View view) -> {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://bastiaan.ml/")));
         });
 
         // Check to update accounts data
@@ -256,40 +230,38 @@ public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLo
                 // When no accounts are left create new own
                 if (jsonAccounts.length() == 0) {
                     // Send register request
-                    FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, new FetchDataTask.OnLoadListener() {
-                        public void onLoad(String response) {
-                            try {
-                                // Parse response
-                                JSONObject jsonResponse = new JSONObject(response);
+                    new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, (String response) -> {
+                        try {
+                            // Parse response
+                            JSONObject jsonResponse = new JSONObject(response);
 
-                                // When successfull add and update accounts list
-                                if (jsonResponse.getBoolean("success")) {
-                                    // Parse account
-                                    Account account = Account.fromJsonApiResponse(jsonResponse);
+                            // When successfull add and update accounts list
+                            if (jsonResponse.getBoolean("success")) {
+                                // Parse account
+                                Account otherAccount = Account.fromJsonApiResponse(jsonResponse);
 
-                                    // Save it
-                                    addAccount(account);
+                                // Save it
+                                addAccount(otherAccount);
 
-                                    // Add to the accounts list
-                                    accountsAdapter.clear();
-                                    accountsAdapter.add(account);
-                                    accountsAdapter.add(null);
-                                    accountsAdapter.add(null);
-                                    accountsAdapter.setSelectedAccountId(account.getId());
+                                // Add to the accounts list
+                                accountsAdapter.clear();
+                                accountsAdapter.add(otherAccount);
+                                accountsAdapter.add(null);
+                                accountsAdapter.add(null);
+                                accountsAdapter.setSelectedAccountId(otherAccount.getId());
 
-                                    // Save new selected account id
-                                    SharedPreferences.Editor settingsEditor = settings.edit();
-                                    settingsEditor.putLong("selected_account_id", account.getId());
-                                    settingsEditor.apply();
-                                    return;
-                                }
-                            } catch (Exception exception) {
-                                exception.printStackTrace();
+                                // Save new selected account id
+                                SharedPreferences.Editor otherSettingsEditor = settings.edit();
+                                otherSettingsEditor.putLong("selected_account_id", otherAccount.getId());
+                                otherSettingsEditor.apply();
+                                return;
                             }
-
-                            // When an error occurt or success is false show an error message
-                            Toast.makeText(SettingsActivity.this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
                         }
+
+                        // When an error occurt or success is false show an error message
+                        Toast.makeText(this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
                     });
                 }
 
@@ -369,7 +341,7 @@ public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLo
             }
 
             // Do request
-            FetchDataTask.fetchData(this, url, false, false, this);
+            new FetchDataTask(this, url, false, false, this);
         }
     }
 

@@ -23,7 +23,7 @@
     <string name="settings_theme_label">Theme</string>
     <string name="settings_cancel">Cancel</string>
     <string name="settings_zoom_label">Enable zoom</string>
-    <string name="settings_about_label">This application is made by Bastiaan van der Plaat but WarQuest is made by Willem van der Plaat</string>
+    <string name="settings_about_button">This application is made by Bastiaan van der Plaat but WarQuest is made by Willem van der Plaat</string>
     <string name="settings_update_error_message">Can\'t connect to the WarQuest server</string>
 
     <string name="settings_remove_alert_title">Remove account?</string>

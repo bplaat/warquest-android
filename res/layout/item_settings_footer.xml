@@ -62,7 +62,7 @@
     </LinearLayout>
 
     <TextView android:id="@+id/settings_about_button"
-        android:text="@string/settings_about_label"
+        android:text="@string/settings_about_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"

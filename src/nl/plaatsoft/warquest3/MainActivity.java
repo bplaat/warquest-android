@@ -1,6 +1,5 @@
 package nl.plaatsoft.warquest3;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -26,11 +25,10 @@ import org.json.JSONObject;
 
 // The main (webview) activity
 public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadListener {
-    private static final int SETTINGS_ACTIVITY_REQUEST_CODE = 1;
+    public static final int SETTINGS_ACTIVITY_REQUEST_CODE = 1;
 
-    public int oldLanguage = -1;
-    public int oldTheme = -1;
-    private SharedPreferences settings;
+    private int oldLanguage = -1;
+    private int oldTheme = -1;
     private Account activeAccount;
     private WebView webview;
 
@@ -44,16 +42,11 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Load settings
-        settings = getSharedPreferences("settings", Context.MODE_PRIVATE);
-
         // Main settings button handler
-        ((ImageView)findViewById(R.id.main_settings_button)).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                oldLanguage = settings.getInt("language", SettingsActivity.LANGUAGE_DEFAULT);
-                oldTheme = settings.getInt("theme", SettingsActivity.THEME_DEFAULT);
-                startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), MainActivity.SETTINGS_ACTIVITY_REQUEST_CODE);
-            }
+        ((ImageView)findViewById(R.id.main_settings_button)).setOnClickListener((View view) -> {
+            oldLanguage = settings.getInt("language", SettingsActivity.LANGUAGE_DEFAULT);
+            oldTheme = settings.getInt("theme", SettingsActivity.THEME_DEFAULT);
+            startActivityForResult(new Intent(this, SettingsActivity.class), MainActivity.SETTINGS_ACTIVITY_REQUEST_CODE);
         });
 
         // Init webview
@@ -71,11 +64,9 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
         LinearLayout disconnectedPage = (LinearLayout)findViewById(R.id.main_disconnected_page);
 
         // Disconnected page refresh button
-        ((Button)findViewById(R.id.main_disconnected_refresh_button)).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                // Refresh the webview
-                loadWebview(Config.WARQUEST_URL + "/");
-            }
+        ((Button)findViewById(R.id.main_disconnected_refresh_button)).setOnClickListener((View view) -> {
+            // Refresh the webview
+            loadWebview(Config.WARQUEST_URL + "/");
         });
 
         // Webview update title handler
@@ -145,7 +136,7 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
             }
 
             // Do login request and save and open
-            FetchDataTask.fetchData(this, url, false, false, this);
+            new FetchDataTask(this, url, false, false, this);
 
             // Set and save old zoom when disabled
             boolean oldZoom = oldSettings.getBoolean("zoom", true);
@@ -167,7 +158,7 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                 // When there are no accounts create new one
                 if (jsonAccounts.length() == 0) {
                     // Do register request and save and open
-                    FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
+                    new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
                 }
 
                 // Else get selected account and load webview
@@ -197,12 +188,12 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                 exception.printStackTrace();
 
                 // Do register request and save and open
-                FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
+                new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
             }
         }
 
         // Check rating alert
-        RatingAlert.check(MainActivity.this);
+        RatingAlert.check(this);
     }
 
     // When a warquest link is opend open the page
@@ -251,7 +242,7 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                     exception.printStackTrace();
 
                     // Do register request and save and open
-                    FetchDataTask.fetchData(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
+                    new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
                 }
             }
 
@@ -262,10 +253,8 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                     oldTheme != settings.getInt("theme", SettingsActivity.THEME_DEFAULT)
                 ) {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable() {
-                        public void run() {
-                            recreate();
-                        }
+                    handler.post(() -> {
+                        recreate();
                     });
                 }
             }
@@ -323,7 +312,7 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
         }
 
         // When an error occurt or success is false show an error message
-        Toast.makeText(MainActivity.this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
     }
 
     // Load url in webview

@@ -50,40 +50,34 @@ public class RatingAlert {
         new AlertDialog.Builder(context)
             .setTitle(R.string.rating_alert_title)
             .setMessage(R.string.rating_alert_message_label)
-            .setPositiveButton(R.string.rating_alert_rate_button, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Open the store page for the user to add a rating
-                    String appPackageName = context.getPackageName();
-                    try {
-                        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
+            .setPositiveButton(R.string.rating_alert_rate_button, (DialogInterface dialog, int whichButton) -> {
+                // Open the store page for the user to add a rating
+                String appPackageName = context.getPackageName();
+                try {
+                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (Exception exception) {
+                    exception.printStackTrace();
 
-                        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                    }
+                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
 
-                    // Set the rating hidden flag
-                    SharedPreferences.Editor settingsEditor = settings.edit();
-                    settingsEditor.putBoolean("rating_hidden", true);
-                    settingsEditor.commit();
-                }
+                // Set the rating hidden flag
+                SharedPreferences.Editor settingsEditor = settings.edit();
+                settingsEditor.putBoolean("rating_hidden", true);
+                settingsEditor.commit();
             })
-            .setNeutralButton(R.string.rating_alert_later_button, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Reset the rating counters
-                    SharedPreferences.Editor settingsEditor = settings.edit();
-                    settingsEditor.putInt("rating_launch_count", 0);
-                    settingsEditor.putLong("rating_first_launch_time", System.currentTimeMillis());
-                    settingsEditor.commit();
-                }
+            .setNeutralButton(R.string.rating_alert_later_button, (DialogInterface dialog, int whichButton) -> {
+                // Reset the rating counters
+                SharedPreferences.Editor settingsEditor = settings.edit();
+                settingsEditor.putInt("rating_launch_count", 0);
+                settingsEditor.putLong("rating_first_launch_time", System.currentTimeMillis());
+                settingsEditor.commit();
             })
-            .setNegativeButton(R.string.rating_alert_never_button, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Set the rating hidden flag
-                    SharedPreferences.Editor settingsEditor = settings.edit();
-                    settingsEditor.putBoolean("rating_hidden", true);
-                    settingsEditor.commit();
-                }
+            .setNegativeButton(R.string.rating_alert_never_button, (DialogInterface dialog, int whichButton)-> {
+                // Set the rating hidden flag
+                SharedPreferences.Editor settingsEditor = settings.edit();
+                settingsEditor.putBoolean("rating_hidden", true);
+                settingsEditor.commit();
             })
             .show();
     }
