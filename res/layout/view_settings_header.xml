@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/ListTop">
+
+    <TextView android:text="@string/settings_accounts_label"
+        style="@style/ListItemSubtitle" />
+
+    <LinearLayout style="@style/ListGroupTop" />
+</LinearLayout>

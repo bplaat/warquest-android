@@ -1,41 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="56dp"
-    android:orientation="horizontal">
+    android:descendantFocusability="blocksDescendants"
+    style="@style/ListItemButton">
 
     <ImageView android:id="@+id/account_avatar_image"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_margin="4dp"
-        android:background="@color/loading_background_color" />
+        style="@style/ListItemButtonAvatar" />
 
-    <LinearLayout android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_weight="1"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:orientation="vertical"
-        android:gravity="center_vertical">
-
+    <LinearLayout style="@style/ListItemButtonMultiLineLabel">
         <TextView android:id="@+id/account_nickname_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:singleLine="true"
-            android:ellipsize="end" />
+            style="@style/ListItemButtonMultiLineLabelLTitleLabel" />
 
         <TextView android:id="@+id/account_info_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/secondary_text_color"
-            android:singleLine="true"
-            android:ellipsize="end" />
+            style="@style/ListItemButtonMultiLineLabelDescriptionLabel" />
     </LinearLayout>
 
-    <ImageView android:id="@+id/account_remove_button"
+    <ImageButton android:id="@+id/account_remove_button"
         android:src="@drawable/ic_close"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:scaleType="center" />
+        style="@style/ListItemButtonIconButton" />
 </LinearLayout>

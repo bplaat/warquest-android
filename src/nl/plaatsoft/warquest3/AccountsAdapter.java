@@ -7,31 +7,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.text.NumberFormat;
 
 // Accounts list adapter
 public class AccountsAdapter extends ArrayAdapter<Account> {
-    // Account view holder
-    private static class AccountViewHolder {
+    private static class ViewHolder {
         public ImageView accountAvatarImage;
         public TextView accountNicknameLabel;
         public TextView accountInfoLabel;
-        public ImageView accountRemoveButton;
+        public ImageButton accountRemoveButton;
     }
 
-    // Account action button view holder
-    private static class AccountButtonViewHolder {
-        public ImageView accountButtonImage;
-        public TextView accountButtonLabel;
-    }
+    private long selectedAccountId = -1;
 
-    private long selectedAccountId;
-
-    public AccountsAdapter(Context context, long selectedAccountId) {
+    public AccountsAdapter(Context context) {
        super(context, 0);
-       this.selectedAccountId = selectedAccountId;
+    }
+
+    public long getSelectedAccountId() {
+        return selectedAccountId;
     }
 
     public void setSelectedAccountId(long selectedAccountId) {
@@ -40,75 +37,45 @@ public class AccountsAdapter extends ArrayAdapter<Account> {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        Context context = getContext();
-
-        // Create account view
-        if (position < getCount() - 2 && (convertView == null || convertView.getTag() instanceof AccountButtonViewHolder)) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.item_account, parent, false);
-            AccountViewHolder accountViewHolder = new AccountViewHolder();
-            accountViewHolder.accountAvatarImage = (ImageView)convertView.findViewById(R.id.account_avatar_image);
-            accountViewHolder.accountNicknameLabel = (TextView)convertView.findViewById(R.id.account_nickname_label);
-            accountViewHolder.accountInfoLabel = (TextView)convertView.findViewById(R.id.account_info_label);
-            accountViewHolder.accountRemoveButton = (ImageView)convertView.findViewById(R.id.account_remove_button);
-            convertView.setTag(accountViewHolder);
+        ViewHolder viewHolder;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_account, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.accountAvatarImage = (ImageView)convertView.findViewById(R.id.account_avatar_image);
+            viewHolder.accountNicknameLabel = (TextView)convertView.findViewById(R.id.account_nickname_label);
+            viewHolder.accountInfoLabel = (TextView)convertView.findViewById(R.id.account_info_label);
+            viewHolder.accountRemoveButton = (ImageButton)convertView.findViewById(R.id.account_remove_button);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder)convertView.getTag();
         }
 
-        // Create account action button view
-        if (position >= getCount() - 2 && (convertView == null || convertView.getTag() instanceof AccountViewHolder)) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.item_account_button, parent, false);
-            AccountButtonViewHolder accountButtonViewHolder = new AccountButtonViewHolder();
-            accountButtonViewHolder.accountButtonImage = (ImageView)convertView.findViewById(R.id.account_button_image);
-            accountButtonViewHolder.accountButtonLabel = (TextView)convertView.findViewById(R.id.account_button_label);
-            convertView.setTag(accountButtonViewHolder);
+        Account account = getItem(position);
+
+        if (account.getId() == selectedAccountId) {
+            convertView.setBackgroundResource(R.color.selected_background_color);
+        } else {
+            convertView.setBackgroundColor(0);
         }
 
-        // Fill account view
-        if (position < getCount() - 2) {
-            AccountViewHolder accountViewHolder = (AccountViewHolder)convertView.getTag();
-            Account account = getItem(position);
+        FetchImageTask.with(getContext())
+            .load(Config.APP_GRAVATAR_URL + "/avatar/" + Utils.md5(account.getEmail()) + "?s=" + Utils.convertDpToPixel(getContext(), 40) + "&d=mp")
+            .fadeIn()
+            .into(viewHolder.accountAvatarImage);
 
-            // Highlight account button if selected
-            if (account.getId() == selectedAccountId) {
-                convertView.setBackgroundResource(R.color.selected_background_color);
-            } else {
-                convertView.setBackgroundResource(0);
-            }
+        viewHolder.accountNicknameLabel.setText(account.getNickname());
+        viewHolder.accountInfoLabel.setText(getContext().getResources().getString(R.string.account_info_label, account.getLevel(), NumberFormat.getInstance(Utils.getCurrentLocale(getContext())).format(account.getExperience())));
 
-            // Load avatar image async
-            new FetchImageTask(context, accountViewHolder.accountAvatarImage, Config.GRAVATAR_URL + Utils.md5(account.getEmail()) + "?s=" + Utils.convertDpToPixel(context, 40) + "&d=mp", true, true);
-
-            // Set account labels
-            accountViewHolder.accountNicknameLabel.setText(account.getNickname());
-            accountViewHolder.accountInfoLabel.setText(context.getResources().getString(R.string.account_info_label, account.getLevel(), NumberFormat.getInstance(Utils.getCurrentLocale(context)).format(account.getExperience())));
-
-            // When remove button is clicked
-            accountViewHolder.accountRemoveButton.setOnClickListener((View view) -> {
-                // Show remove warning alert
-                new AlertDialog.Builder(context)
-                    .setTitle(R.string.settings_remove_alert_title)
-                    .setMessage(R.string.settings_remove_alert_message_label)
-                    .setPositiveButton(R.string.settings_remove_alert_remove_button, (DialogInterface dialog, int whichButton) -> {
-                        // Request account removal at parent activity
-                        ((SettingsActivity)context).removeAccount(position);
-                    })
-                    .setNegativeButton(R.string.settings_remove_alert_cancel_button, null)
-                    .show();
-            });
-        }
-
-        // Fill add account action button
-        if (position == getCount() - 2) {
-            AccountButtonViewHolder accountButtonViewHolder = (AccountButtonViewHolder)convertView.getTag();
-            accountButtonViewHolder.accountButtonImage.setImageResource(R.drawable.ic_account_plus);
-            accountButtonViewHolder.accountButtonLabel.setText(context.getResources().getString(R.string.settings_add_account_button));
-        }
-
-        // Fill create account action button
-        if (position == getCount() - 1) {
-            AccountButtonViewHolder accountButtonViewHolder = (AccountButtonViewHolder)convertView.getTag();
-            accountButtonViewHolder.accountButtonImage.setImageResource(R.drawable.ic_account_details);
-            accountButtonViewHolder.accountButtonLabel.setText(context.getResources().getString(R.string.settings_create_account_button));
-        }
+        viewHolder.accountRemoveButton.setOnClickListener((View view) -> {
+            new AlertDialog.Builder(getContext())
+                .setTitle(R.string.account_remove_alert_title_label)
+                .setMessage(R.string.account_remove_alert_message_label)
+                .setPositiveButton(R.string.account_remove_alert_remove_button, (DialogInterface dialog, int whichButton) -> {
+                    ((SettingsActivity)getContext()).removeAccount(account);
+                })
+                .setNegativeButton(R.string.account_remove_alert_cancel_button, null)
+                .show();
+        });
 
         return convertView;
     }

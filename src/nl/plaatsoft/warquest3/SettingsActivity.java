@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
@@ -21,106 +22,44 @@ import java.net.URLEncoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-// The settings activity
-public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLoadListener {
-    public static final int LANGUAGE_DEFAULT = 2;
-    public static final int THEME_DEFAULT = 1;
+public class SettingsActivity extends BaseActivity {
     private static final int LOGIN_ACTIVITY_REQUEST_CODE = 1;
 
     private AccountsAdapter accountsAdapter;
 
-    // Create activity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // Settings back button
-        ((ImageView)findViewById(R.id.settings_back_button)).setOnClickListener((View view) -> {
+        ((ImageButton)findViewById(R.id.settings_back_button)).setOnClickListener((View view) -> {
             finish();
         });
 
-        // Accounts list view create header and footer views and adapter
+        // Accounts list
         ListView accountsList = (ListView)findViewById(R.id.settings_accounts_list);
+        accountsList.addHeaderView((LinearLayout)getLayoutInflater().inflate(R.layout.view_settings_header, accountsList, false));
+        accountsList.addFooterView((LinearLayout)getLayoutInflater().inflate(R.layout.view_settings_footer, accountsList, false));
 
-        accountsList.addHeaderView(getLayoutInflater().inflate(R.layout.item_settings_header, accountsList, false), null, false);
-
-        LinearLayout footerView = (LinearLayout)getLayoutInflater().inflate(R.layout.item_settings_footer, accountsList, false);
-        accountsList.addFooterView(footerView);
-
-        accountsAdapter = new AccountsAdapter(this, settings.getLong("selected_account_id", 0));
+        accountsAdapter = new AccountsAdapter(this);
+        accountsAdapter.setSelectedAccountId(settings.getLong("selected_account_id", -1));
         accountsList.setAdapter(accountsAdapter);
 
-        // Accounts item click event
+        // Accounts list item click event
         accountsList.setOnItemClickListener((AdapterView<?> adapterView, View view, int position, long id) -> {
-            position -= 1;
-
-            // Normal account button
-            if (position < accountsAdapter.getCount() - 2) {
-                // Get account
-                Account account = accountsAdapter.getItem(position);
-
-                // Save new selected account id
-                SharedPreferences.Editor settingsEditor = settings.edit();
-                settingsEditor.putLong("selected_account_id", account.getId());
-                settingsEditor.apply();
-
-                // Close activity
-                finish();
-            }
-
-            // Add existing account button
-            if (position == accountsAdapter.getCount() - 2) {
-                // Open login activity
-                startActivityForResult(new Intent(this, LoginActivity.class), SettingsActivity.LOGIN_ACTIVITY_REQUEST_CODE);
-            }
-
-            // Create new account button
-            if (position == accountsAdapter.getCount() - 1) {
-                // Send register request
-                new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, (String response) -> {
-                    try {
-                        // Parse response
-                        JSONObject jsonResponse = new JSONObject(response);
-
-                        // When successfull add and open account
-                        if (jsonResponse.getBoolean("success")) {
-                            Account account = Account.fromJsonApiResponse(jsonResponse);
-                            addAccount(account);
-                            openAccount(account);
-                            return;
-                        }
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
-                    }
-
-                    // When an error occurt or success is false show an error message
-                    Toast.makeText(this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
-                });
-            }
+            openAccount(accountsAdapter.getItem(position - 1));
         });
 
-        // Accounts long press event
+        // Accounts list item long press event
         accountsList.setOnItemLongClickListener((AdapterView<?> adapterView, View view, int position, long id) -> {
-            position -= 1;
-
-            // Normal account button when long pressed some extra account information
-            if (position < accountsAdapter.getCount() - 2) {
-                // Get account
-                Account account = accountsAdapter.getItem(position);
-
-                // Show toast with extra information
-                Toast.makeText(
-                    this,
-                    "Username: " + account.getUsername() + "\n" +
-                    "Email: " + (account.getEmail().equals("") ? "?" : account.getEmail()) + "\n" +
-                    "Password: " + account.getPassword(),
-                    Toast.LENGTH_LONG
-                ).show();
-
-                return true;
-            }
-
-            return false;
+            Account account = accountsAdapter.getItem(position - 1);
+            Toast.makeText(
+                this,
+                "Username: " + account.getUsername() + "\n" +
+                "Email: " + (account.getEmail().equals("") ? "?" : account.getEmail()) + "\n" +
+                "Password: " + account.getPassword(),
+                Toast.LENGTH_LONG
+            ).show();
+            return true;
         });
 
         // Load accounts from settings
@@ -134,103 +73,287 @@ public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLo
             exception.printStackTrace();
         }
 
-        // Add two nulls for action buttons
-        accountsAdapter.add(null);
-        accountsAdapter.add(null);
+        // Login button
+        ((LinearLayout)findViewById(R.id.settings_login_account_button)).setOnClickListener((View view) -> {
+            startActivityForResult(new Intent(this, LoginActivity.class), SettingsActivity.LOGIN_ACTIVITY_REQUEST_CODE);
+        });
 
-        // Settings language selector button
-        String[] languages = getResources().getStringArray(R.array.languages);
-        int language = settings.getInt("language", SettingsActivity.LANGUAGE_DEFAULT);
-        ((TextView)findViewById(R.id.settings_language_label)).setText(languages[language]);
-
-        ((LinearLayout)findViewById(R.id.settings_language_button)).setOnClickListener((View view) -> {
+        // Create button
+        ((LinearLayout)findViewById(R.id.settings_register_account_button)).setOnClickListener((View view) -> {
             new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.settings_language_label))
-                .setSingleChoiceItems(languages, language, (DialogInterface dialog, int which) -> {
-                    SharedPreferences.Editor settingsEditor = settings.edit();
-                    settingsEditor.putInt("language", which);
-                    settingsEditor.apply();
+                .setTitle(R.string.settings_create_alert_title_label)
+                .setMessage(R.string.settings_create_alert_message_label)
+                .setPositiveButton(R.string.settings_create_alert_create_button, (DialogInterface dialog, int whichButton) -> {
+                    // Send register request
+                    FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then((String response) -> {
+                        try {
+                            // Parse response
+                            JSONObject jsonResponse = new JSONObject(response);
 
-                    dialog.dismiss();
-                    recreate();
+                            // When successfull add and open account
+                            if (jsonResponse.getBoolean("success")) {
+                                Account account = Account.fromJsonApiResponse(jsonResponse);
+                                saveAccount(account);
+                                openAccount(account);
+                                return;
+                            }
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+
+                        // When an error occurt or success is false show an error message
+                        Toast.makeText(this, getResources().getString(R.string.settings_error_message), Toast.LENGTH_SHORT).show();
+                    });
                 })
-                .setNegativeButton(getResources().getString(R.string.settings_cancel), null)
+                .setNegativeButton(R.string.settings_create_alert_cancel_button, null)
                 .show();
         });
 
-        // Settings theme selector button
-        String[] themes = getResources().getStringArray(R.array.themes);
-        int theme = settings.getInt("theme", SettingsActivity.THEME_DEFAULT);
-        ((TextView)findViewById(R.id.settings_theme_label)).setText(themes[theme]);
-
-        ((LinearLayout)findViewById(R.id.settings_theme_button)).setOnClickListener((View view) -> {
-            new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.settings_theme_label))
-                .setSingleChoiceItems(themes, theme, (DialogInterface dialog, int which) ->  {
-                    SharedPreferences.Editor settingsEditor = settings.edit();
-                    settingsEditor.putInt("theme", which);
-                    settingsEditor.apply();
-
-                    dialog.dismiss();
-                    recreate();
-                })
-                .setNegativeButton(getResources().getString(R.string.settings_cancel), null)
-                .show();
-        });
-
-        // Zoom switch save code
-        Switch zoomSwitch = (Switch)footerView.findViewById(R.id.settings_zoom_switch);
-        zoomSwitch.setChecked(settings.getBoolean("zoom", true));
+        // Init zoom button
+        Switch zoomSwitch = (Switch)findViewById(R.id.settings_zoom_switch);
+        zoomSwitch.setChecked(settings.getBoolean("zoom", Config.SETTINGS_ZOOM_DEFAULT));
         zoomSwitch.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked) -> {
-            // Save data when changed
             SharedPreferences.Editor settingsEditor = settings.edit();
             settingsEditor.putBoolean("zoom", isChecked);
             settingsEditor.apply();
         });
 
-        // Settings about button
-        ((TextView)findViewById(R.id.settings_about_button)).setOnClickListener((View view) -> {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://bastiaan.ml/")));
+        ((LinearLayout)findViewById(R.id.settings_zoom_button)).setOnClickListener((View view) -> {
+            zoomSwitch.toggle();
         });
 
-        // Check to update accounts data
-        updateAccountsData();
+        // Init language switcher button
+        String[] languages = getResources().getStringArray(R.array.settings_languages);
+        int language = settings.getInt("language", Config.SETTINGS_LANGUAGE_DEFAULT);
+        ((TextView)findViewById(R.id.settings_language_label)).setText(languages[language]);
+
+        ((LinearLayout)findViewById(R.id.settings_language_button)).setOnClickListener((View view) -> {
+            new AlertDialog.Builder(this)
+                .setTitle(R.string.settings_language_alert_title_label)
+                .setSingleChoiceItems(languages, language, (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                    if (language != which) {
+                        SharedPreferences.Editor settingsEditor = settings.edit();
+                        settingsEditor.putInt("language", which);
+                        settingsEditor.apply();
+                        recreate();
+                    }
+                })
+                .setNegativeButton(R.string.settings_language_alert_cancel_button, null)
+                .show();
+        });
+
+        // Init themes switcher button
+        String[] themes = getResources().getStringArray(R.array.settings_themes);
+        int theme = settings.getInt("theme", Config.SETTINGS_THEME_DEFAULT);
+        ((TextView)findViewById(R.id.settings_theme_label)).setText(themes[theme]);
+
+        ((LinearLayout)findViewById(R.id.settings_theme_button)).setOnClickListener((View view) -> {
+            new AlertDialog.Builder(this)
+                .setTitle(R.string.settings_theme_alert_title_label)
+                .setSingleChoiceItems(themes, theme, (DialogInterface dialog, int which) ->  {
+                    dialog.dismiss();
+                    if (theme != which) {
+                        SharedPreferences.Editor settingsEditor = settings.edit();
+                        settingsEditor.putInt("theme", which);
+                        settingsEditor.apply();
+                        recreate();
+                    }
+                })
+                .setNegativeButton(R.string.settings_theme_alert_cancel_button, null)
+                .show();
+        });
+
+        // Init version button easter egg
+        try {
+            ((TextView)findViewById(R.id.settings_version_label)).setText("v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        int versionButtonClickCounterHolder[] = { 0 };
+        ((LinearLayout)findViewById(R.id.settings_version_button)).setOnClickListener((View view) -> {
+            versionButtonClickCounterHolder[0]++;
+            if (versionButtonClickCounterHolder[0] == 8) {
+                versionButtonClickCounterHolder[0] = 0;
+                Toast.makeText(this, R.string.settings_version_message, Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtu.be/dQw4w9WgXcQ?t=43")));
+            }
+        });
+
+        // Init rate button
+        ((LinearLayout)findViewById(R.id.settings_rate_button)).setOnClickListener((View view) -> {
+            Utils.openStorePage(this);
+        });
+
+        // Init share button
+        ((LinearLayout)findViewById(R.id.settings_share_button)).setOnClickListener((View view) -> {
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.settings_share_message) + " " + Utils.getStorePageUrl(this));
+            startActivity(Intent.createChooser(intent, null));
+        });
+
+        // Init about button
+        ((LinearLayout)findViewById(R.id.settings_about_button)).setOnClickListener((View view) -> {
+            new AlertDialog.Builder(this)
+                .setTitle(R.string.settings_about_alert_title_label)
+                .setMessage(R.string.settings_about_alert_message_label)
+                .setNegativeButton(R.string.settings_about_alert_website_button, (DialogInterface dialog, int which) ->  {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Config.SETTINGS_ABOUT_WEBSITE_URL)));
+                })
+                .setPositiveButton(R.string.settings_about_alert_ok_button, null)
+                .show();
+        });
+
+        // Init footer button
+        ((TextView)findViewById(R.id.settings_footer_button)).setOnClickListener((View view) -> {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Config.SETTINGS_ABOUT_WEBSITE_URL)));
+        });
+
+        // Check if accounts update timeout is ellapsed
+        long accountsUpdateTime = settings.getLong("accounts_update_time", 0);
+        if (System.currentTimeMillis() - accountsUpdateTime > Config.SETTINGS_ACCOUNTS_UPDATE_TIMEOUT) {
+            // Save new time
+            SharedPreferences.Editor settingsEditor = settings.edit();
+            settingsEditor.putLong("accounts_update_time", System.currentTimeMillis());
+            settingsEditor.apply();
+
+            // Update accounts
+            updateAccounts();
+        }
     }
 
     // When the login page is succesfull add and open account
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SettingsActivity.LOGIN_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             // When the login activity returns an account add and open it
             Account account = (Account)data.getExtras().getSerializable("account");
-            addAccount(account);
+            saveAccount(account);
             openAccount(account);
         }
     }
 
-    // Request to remove account
-    public void removeAccount(int position) {
+    // Update accounts info
+    private void updateAccounts() {
+        // Load accounts json
+        JSONArray jsonAccounts;
+        try {
+            jsonAccounts = new JSONArray(settings.getString("accounts", "[]"));
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            jsonAccounts = new JSONArray();
+        }
+
+        // Create request url
+        String url = Config.APP_WARQUEST_URL + "/api/players?key=" + Config.APP_WARQUEST_API_KEY;
+        try {
+            for (int i = 0; i < jsonAccounts.length(); i++) {
+                Account account = Account.fromJson(jsonAccounts.getJSONObject(i));
+                url += "&usernames[]=" + URLEncoder.encode(account.getUsername(), "UTF-8") +
+                    "&passwords[]=" + URLEncoder.encode(account.getPassword(), "UTF-8");
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        // Do request
+        FetchDataTask.with(this).load(url).then((String response) -> {
+            try {
+                // Parse response
+                JSONObject jsonResponse = new JSONObject(response);
+
+                // When successfull
+                if (jsonResponse.getBoolean("success")) {
+                    JSONArray jsonPlayers = jsonResponse.getJSONArray("players");
+                    JSONArray newJsonAccounts = new JSONArray();
+
+                    // When successfull clear list
+                    accountsAdapter.clear();
+
+                    // Add newly fetched accounts to the list and to array
+                    for (int i = 0; i < jsonPlayers.length(); i++) {
+                        Account account = Account.fromJsonApiResponse(jsonPlayers.getJSONObject(i));
+                        accountsAdapter.add(account);
+                        newJsonAccounts.put(account.toJson());
+                    }
+
+                    // And save new accounts data
+                    SharedPreferences.Editor settingsEditor = settings.edit();
+                    settingsEditor.putString("accounts", newJsonAccounts.toString());
+                    settingsEditor.apply();
+                    return;
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+
+            // When an load error occurt or success is false show update error toast
+            Toast.makeText(this, getResources().getString(R.string.settings_error_message), Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    // Save an new account
+    private void saveAccount(Account account) {
+        try  {
+            // Load accounts json
+            JSONArray jsonAccounts;
+            try {
+                jsonAccounts = new JSONArray(settings.getString("accounts", "[]"));
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                jsonAccounts = new JSONArray();
+            }
+
+            // Add account to json
+            jsonAccounts.put(account.toJson());
+
+            // Save the accounts
+            SharedPreferences.Editor settingsEditor = settings.edit();
+            settingsEditor.putString("accounts", jsonAccounts.toString());
+            settingsEditor.apply();
+        }
+        catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    // Remove account from the accounts list
+    public void removeAccount(Account account) {
+        android.util.Log.e("wq", "Remove " + account.getNickname());
+
         try {
             JSONArray jsonAccounts = new JSONArray(settings.getString("accounts", "[]"));
 
-            Account account = Account.fromJson(jsonAccounts.getJSONObject(position));
+            // Remove account from json accounts
+            int position = 0;
+            for (int i = 0; i < jsonAccounts.length(); i++) {
+                Account otherAccount = Account.fromJson(jsonAccounts.getJSONObject(i));
+                if (otherAccount.getId() == account.getId()) {
+                    position = i;
+                    jsonAccounts.remove(i);
+                }
+            }
 
-            jsonAccounts.remove(position);
+            // Remove account from accounts list
+            accountsAdapter.clear();
+            for (int i = 0; i < jsonAccounts.length(); i++) {
+                accountsAdapter.add(Account.fromJson(jsonAccounts.getJSONObject(i)));
+            }
 
-            // Remove item from accounts list
-            accountsAdapter.remove(accountsAdapter.getItem(position));
-            accountsAdapter.notifyDataSetChanged();
-
+            // Save the new json accounts list
             SharedPreferences.Editor settingsEditor = settings.edit();
             settingsEditor.putString("accounts", jsonAccounts.toString());
+            settingsEditor.apply();
 
             // Do some extra checks when the account was the selected account
-            long selectedAccountId = settings.getLong("selected_account_id", 0);
+            long selectedAccountId = settings.getLong("selected_account_id", -1);
             if (selectedAccountId == account.getId()) {
                 // When no accounts are left create new own
                 if (jsonAccounts.length() == 0) {
                     // Send register request
-                    new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, (String response) -> {
+                    FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then((String response) -> {
                         try {
                             // Parse response
                             JSONObject jsonResponse = new JSONObject(response);
@@ -241,19 +364,13 @@ public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLo
                                 Account otherAccount = Account.fromJsonApiResponse(jsonResponse);
 
                                 // Save it
-                                addAccount(otherAccount);
+                                saveAccount(otherAccount);
 
                                 // Add to the accounts list
-                                accountsAdapter.clear();
                                 accountsAdapter.add(otherAccount);
-                                accountsAdapter.add(null);
-                                accountsAdapter.add(null);
-                                accountsAdapter.setSelectedAccountId(otherAccount.getId());
 
-                                // Save new selected account id
-                                SharedPreferences.Editor otherSettingsEditor = settings.edit();
-                                otherSettingsEditor.putLong("selected_account_id", otherAccount.getId());
-                                otherSettingsEditor.apply();
+                                // Select it
+                                selectAccount(otherAccount);
                                 return;
                             }
                         } catch (Exception exception) {
@@ -261,127 +378,35 @@ public class SettingsActivity extends BaseActivity implements FetchDataTask.OnLo
                         }
 
                         // When an error occurt or success is false show an error message
-                        Toast.makeText(this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getResources().getString(R.string.settings_error_message), Toast.LENGTH_SHORT).show();
                     });
                 }
 
                 // When more accounts exists select the next one
                 else {
-                    Account nextAccount = Account.fromJson(jsonAccounts.getJSONObject(position == 0 ? 0 : position - 1));
-                    settingsEditor.putLong("selected_account_id", nextAccount.getId());
-                    accountsAdapter.setSelectedAccountId(nextAccount.getId());
+                    selectAccount(Account.fromJson(jsonAccounts.getJSONObject(position == 0 ? 0 : position - 1)));
                 }
             }
-            settingsEditor.apply();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
 
-    // Add account
-    private void addAccount(Account account) {
-        // Load accounts json
-        JSONArray jsonAccounts;
-        try {
-            jsonAccounts = new JSONArray(settings.getString("accounts", "[]"));
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            jsonAccounts = new JSONArray();
-        }
+    // Select and account in the accounts list
+    private void selectAccount(Account account) {
+        accountsAdapter.setSelectedAccountId(account.getId());
 
-        // Add account to json
-        jsonAccounts.put(account.toJson());
-
-        // Save the accounts
         SharedPreferences.Editor settingsEditor = settings.edit();
-        settingsEditor.putString("accounts", jsonAccounts.toString());
+        settingsEditor.putLong("selected_account_id", account.getId());
         settingsEditor.apply();
     }
 
-    // Open account
+    // Open an account and close activity
     private void openAccount(Account account) {
-        // Set the selected account to the account id
         SharedPreferences.Editor settingsEditor = settings.edit();
         settingsEditor.putLong("selected_account_id", account.getId());
         settingsEditor.apply();
 
-        // Close activity
         finish();
-    }
-
-    // Update accounts data
-    private void updateAccountsData() {
-        // Check if accounts update timeout is ellapsed
-        long accountsUpdateTime = settings.getLong("accounts_update_time", 0);
-        if (System.currentTimeMillis() - accountsUpdateTime > Config.ACCOUNTS_UPDATE_TIMEOUT) {
-            // Save new time
-            SharedPreferences.Editor settingsEditor = settings.edit();
-            settingsEditor.putLong("accounts_update_time", System.currentTimeMillis());
-            settingsEditor.apply();
-
-            // Load accounts json
-            JSONArray jsonAccounts;
-            try {
-                jsonAccounts = new JSONArray(settings.getString("accounts", "[]"));
-            } catch (Exception exception) {
-                exception.printStackTrace();
-                jsonAccounts = new JSONArray();
-            }
-
-            // Create request url
-            String url = Config.WARQUEST_URL + "/api/players?key=" + Config.WARQUEST_API_KEY;
-            try {
-                for (int i = 0; i < jsonAccounts.length(); i++) {
-                    Account account = Account.fromJson(jsonAccounts.getJSONObject(i));
-                    url += "&usernames[]=" + URLEncoder.encode(account.getUsername(), "UTF-8") +
-                        "&passwords[]=" + URLEncoder.encode(account.getPassword(), "UTF-8");
-                }
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-
-            // Do request
-            new FetchDataTask(this, url, false, false, this);
-        }
-    }
-
-    // Update onload listener
-    public void onLoad(String response) {
-        try {
-            // Parse response
-            JSONObject jsonResponse = new JSONObject(response);
-
-            // When successfull
-            if (jsonResponse.getBoolean("success")) {
-                JSONArray jsonPlayers = jsonResponse.getJSONArray("players");
-                JSONArray jsonAccounts = new JSONArray();
-
-                // When successfull clear list
-                accountsAdapter.clear();
-
-                // Add newly fetched accounts to the list and to array
-                for (int i = 0; i < jsonPlayers.length(); i++) {
-                    Account account = Account.fromJsonApiResponse(jsonPlayers.getJSONObject(i));
-                    accountsAdapter.add(account);
-                    jsonAccounts.put(account.toJson());
-                }
-
-                // Add two nulls for action buttons and notify change
-                accountsAdapter.add(null);
-                accountsAdapter.add(null);
-                accountsAdapter.notifyDataSetChanged();
-
-                // And save new accounts data
-                SharedPreferences.Editor settingsEditor = settings.edit();
-                settingsEditor.putString("accounts", jsonAccounts.toString());
-                settingsEditor.apply();
-                return;
-            }
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-
-        // When an load error occurt or success is false show update error toast
-        Toast.makeText(this, getResources().getString(R.string.settings_update_error_message), Toast.LENGTH_SHORT).show();
     }
 }

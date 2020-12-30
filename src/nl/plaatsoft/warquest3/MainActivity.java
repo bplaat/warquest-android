@@ -2,7 +2,8 @@ package nl.plaatsoft.warquest3;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Handler;
@@ -14,25 +15,33 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.TextSwitcher;
 import android.widget.Toast;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-// The main (webview) activity
-public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadListener {
+public class MainActivity extends BaseActivity {
     public static final int SETTINGS_ACTIVITY_REQUEST_CODE = 1;
 
+    private Handler handler;
+
+    private LinearLayout webviewPage;
+    private WebView webview;
+    private String webviewTitle;
+
+    private LinearLayout disconnectedPage;
+
+    private Account activeAccount;
+    private FetchDataTask.OnLoadListener saveAndOpenFirstAccount;
     private int oldLanguage = -1;
     private int oldTheme = -1;
-    private Account activeAccount;
-    private WebView webview;
+    private boolean isRatingAlertUpdated = false;
 
-    // Supress warnings to get deprecated old settings
     @SuppressWarnings("deprecation")
     public SharedPreferences getOldSettings() {
         return android.preference.PreferenceManager.getDefaultSharedPreferences(this);
@@ -42,93 +51,156 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Main settings button handler
-        ((ImageView)findViewById(R.id.main_settings_button)).setOnClickListener((View view) -> {
-            oldLanguage = settings.getInt("language", SettingsActivity.LANGUAGE_DEFAULT);
-            oldTheme = settings.getInt("theme", SettingsActivity.THEME_DEFAULT);
-            startActivityForResult(new Intent(this, SettingsActivity.class), MainActivity.SETTINGS_ACTIVITY_REQUEST_CODE);
-        });
+        handler = new Handler(Looper.getMainLooper());
 
-        // Init webview
-        webview = (WebView)findViewById(R.id.main_webview);
-        webview.setBackgroundColor(Color.TRANSPARENT);
+        // Webview page
+        webviewPage = (LinearLayout)findViewById(R.id.main_webview_page);
+
+        webview = (WebView)findViewById(R.id.main_webview_webview);
+        webview.setBackgroundColor(0);
 
         WebSettings webSettings = webview.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setUseWideViewPort(true);
-        webSettings.setBuiltInZoomControls(settings.getBoolean("zoom", true));
+        webSettings.setBuiltInZoomControls(settings.getBoolean("zoom", Config.SETTINGS_ZOOM_DEFAULT));
         webSettings.setDisplayZoomControls(false);
 
-        // Init disconnected page
-        LinearLayout disconnectedPage = (LinearLayout)findViewById(R.id.main_disconnected_page);
+        View.OnClickListener settingsOnClick = (View view) -> {
+            oldLanguage = settings.getInt("language", Config.SETTINGS_LANGUAGE_DEFAULT);
+            oldTheme = settings.getInt("theme", Config.SETTINGS_THEME_DEFAULT);
+            startActivityForResult(new Intent(this, SettingsActivity.class), MainActivity.SETTINGS_ACTIVITY_REQUEST_CODE);
+        };
+        ((ImageButton)findViewById(R.id.main_webview_settings_button)).setOnClickListener(settingsOnClick);
 
-        // Disconnected page refresh button
-        ((Button)findViewById(R.id.main_disconnected_refresh_button)).setOnClickListener((View view) -> {
-            // Refresh the webview
-            loadWebview(Config.WARQUEST_URL + "/");
-        });
+        // Disconnected page
+        disconnectedPage = (LinearLayout)findViewById(R.id.main_disconnected_page);
 
-        // Webview update title handler
-        TextView headerTitle = (TextView)findViewById(R.id.main_header_title);
+        View.OnClickListener refreshOnClick = (View view) -> {
+            // TODO
+            recreate();
+        };
+        ((ImageButton)findViewById(R.id.main_disconnected_refresh_button)).setOnClickListener(refreshOnClick);
+        ((Button)findViewById(R.id.main_disconnected_hero_button)).setOnClickListener(refreshOnClick);
+
+        ((ImageButton)findViewById(R.id.main_disconnected_settings_button)).setOnClickListener(settingsOnClick);
+
+        // Webview handlers
+        TextSwitcher webviewTitleLabel = (TextSwitcher)findViewById(R.id.main_webview_title_label);
+        webviewTitleLabel.setCurrentText(getResources().getString(R.string.app_name));
         webview.setWebChromeClient(new WebChromeClient() {
             public void onReceivedTitle(WebView view, String title) {
-                // Filter weird Android bug out
-                if (title.equals(Config.WARQUEST_URL)) {
-                    return;
-                }
+                webviewTitle = title;
+                webviewTitleLabel.setText(title);
+            }
+        });
 
-                // Check if the disconnected page must bee soon
-                if (title.equals("about:blank")) {
-                    headerTitle.setText("WarQuest");
-                    webview.clearHistory();
-                    webview.setVisibility(View.GONE);
-                    disconnectedPage.setVisibility(View.VISIBLE);
-                }
+        Uri baseUri = Uri.parse(Config.APP_WARQUEST_URL);
+        webview.setWebViewClient(new WebViewClient() {
+            @SuppressWarnings("deprecation")
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return shouldOverrideUrlLoading(view, Uri.parse(url));
+            }
 
-                // Else just load normal and set title
-                else {
-                    headerTitle.setText(title);
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return shouldOverrideUrlLoading(view, request.getUrl());
+            }
 
-                    // Check if the webview is hidden
-                    if (disconnectedPage.getVisibility() == View.VISIBLE) {
-                        webview.clearHistory();
-                        webview.setVisibility(View.VISIBLE);
-                        disconnectedPage.setVisibility(View.GONE);
+            private boolean shouldOverrideUrlLoading(WebView view, Uri uri) {
+                if (uri.getScheme().equals(baseUri.getScheme()) && uri.getHost().equals(baseUri.getHost())) {
+                    return false;
+                } else {
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                        return true;
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                        return false;
                     }
                 }
             }
-        });
 
-        // Set webview client for error (no internet handling)
-        webview.setWebViewClient(new WebViewClient() {
-            // When an error occcurt no internet show disconnected page
             @SuppressWarnings("deprecation")
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                webview.stopLoading();
-                webview.loadUrl("about:blank");
+                onReceivedError(view);
             }
 
-            // Send new version of the API to old deprecated onReceivedError function
             public void onReceivedError(WebView view, WebResourceRequest webResourceRequest, WebResourceError webResourceError) {
                 if (webResourceRequest.isForMainFrame()) {
-                    onReceivedError(
-                        view,
-                        webResourceError.getErrorCode(),
-                        webResourceError.getDescription().toString(),
-                        webResourceRequest.getUrl().toString()
-                    );
+                    onReceivedError(view);
+                }
+            }
+
+            private void onReceivedError(WebView view) {
+                view.stopLoading();
+
+                if (disconnectedPage.getVisibility() == View.GONE) {
+                    webviewPage.setVisibility(View.GONE);
+                    disconnectedPage.setVisibility(View.VISIBLE);
+                }
+            }
+
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                if (disconnectedPage.getVisibility() == View.VISIBLE) {
+                    disconnectedPage.setVisibility(View.GONE);
+                    webviewPage.setVisibility(View.VISIBLE);
                 }
             }
         });
+
+        // Save a new account and open it in the webview
+        saveAndOpenFirstAccount = (String response) -> {
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                if (jsonResponse.getBoolean("success")) {
+                    // Set the active account
+                    activeAccount = Account.fromJsonApiResponse(jsonResponse);
+
+                    // Add account to json accounts
+                    JSONArray jsonAccounts = new JSONArray();
+                    jsonAccounts.put(activeAccount.toJson());
+
+                    // Save data
+                    SharedPreferences.Editor settingsEditor = settings.edit();
+                    settingsEditor.putString("accounts", jsonAccounts.toString());
+                    settingsEditor.putLong("selected_account_id", activeAccount.getId());
+                    settingsEditor.apply();
+
+                    // Remove old settings when we where converting
+                    SharedPreferences oldSettings = getOldSettings();
+                    if (oldSettings.contains("username")) {
+                        SharedPreferences.Editor oldSettingsEditor = oldSettings.edit();
+                        oldSettingsEditor.clear();
+                        oldSettingsEditor.apply();
+                    }
+
+                    // Reload the webview
+                    webviewLoadBaseUrl();
+                    return;
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+
+            // When an error occurt or success is false show an error message
+            Toast.makeText(this, getResources().getString(R.string.main_error_message), Toast.LENGTH_SHORT).show();
+        };
 
         // Convert old settings to new format
         SharedPreferences oldSettings = getOldSettings();
         if (oldSettings.contains("username")) {
+            // Set and save old zoom when disabled
+            boolean oldZoom = oldSettings.getBoolean("zoom", Config.SETTINGS_ZOOM_DEFAULT);
+            webSettings.setBuiltInZoomControls(oldZoom);
+
+            SharedPreferences.Editor settingsEditor = settings.edit();
+            settingsEditor.putBoolean("zoom", false);
+            settingsEditor.apply();
+
             // Create request url for login request
             String url = null;
             try {
-                url = Config.WARQUEST_URL + "/api/auth/login?key=" + Config.WARQUEST_API_KEY +
+                url = Config.APP_WARQUEST_URL + "/api/auth/login?key=" + Config.APP_WARQUEST_API_KEY +
                     "&username=" + URLEncoder.encode(oldSettings.getString("username", null), "UTF-8") +
                     "&password=" + URLEncoder.encode(oldSettings.getString("password", null), "UTF-8");
             } catch (Exception exception) {
@@ -136,17 +208,7 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
             }
 
             // Do login request and save and open
-            new FetchDataTask(this, url, false, false, this);
-
-            // Set and save old zoom when disabled
-            boolean oldZoom = oldSettings.getBoolean("zoom", true);
-            if (oldZoom == false) {
-                webSettings.setBuiltInZoomControls(false);
-
-                SharedPreferences.Editor settingsEditor = settings.edit();
-                settingsEditor.putBoolean("zoom", false);
-                settingsEditor.apply();
-            }
+            FetchDataTask.with(this).load(url).then(saveAndOpenFirstAccount);
         }
 
         // When no old account convert
@@ -158,20 +220,20 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                 // When there are no accounts create new one
                 if (jsonAccounts.length() == 0) {
                     // Do register request and save and open
-                    new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
+                    FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then(saveAndOpenFirstAccount);
                 }
 
                 // Else get selected account and load webview
                 else {
                     // Get selected account id
-                    long selectedAccountId = settings.getLong("selected_account_id", 0);
-                    if (selectedAccountId == 0) {
+                    long selectedAccountId = settings.getLong("selected_account_id", -1);
+                    if (selectedAccountId == -1) {
                         selectedAccountId = Account.fromJson(jsonAccounts.getJSONObject(0)).getId();
                     }
 
                     // Find selected account
                     for (int i = 0; i < jsonAccounts.length(); i++) {
-                        Account account =Account.fromJson(jsonAccounts.getJSONObject(i));
+                        Account account = Account.fromJson(jsonAccounts.getJSONObject(i));
                         if (account.getId() == selectedAccountId) {
                             activeAccount = account;
                             break;
@@ -179,7 +241,7 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                     }
 
                     // Load the webview
-                    loadWebview(Config.WARQUEST_URL + "/");
+                    webviewLoadBaseUrl();
                 }
             }
 
@@ -188,33 +250,20 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                 exception.printStackTrace();
 
                 // Do register request and save and open
-                new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
+                FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then(saveAndOpenFirstAccount);
             }
         }
-
-        // Check rating alert
-        RatingAlert.check(this);
     }
 
-    // When a warquest link is opend open the page
-    public void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        if (intent.getAction() == Intent.ACTION_VIEW) {
-            loadWebview(intent.getDataString());
-        }
-    }
-
-    // When the settings activity is closed update stuff
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MainActivity.SETTINGS_ACTIVITY_REQUEST_CODE) {
             // Set zoom value
-            boolean zoom = settings.getBoolean("zoom", true);
+            boolean zoom = settings.getBoolean("zoom", Config.SETTINGS_ZOOM_DEFAULT);
             WebSettings webSettings = webview.getSettings();
             webSettings.setBuiltInZoomControls(zoom);
 
             // Reset zoom when zoom changed or active account changed
-            long selectedAccountId = settings.getLong("selected_account_id", 0);
+            long selectedAccountId = settings.getLong("selected_account_id", -1);
             if (!zoom || activeAccount.getId() != selectedAccountId) {
                 webSettings.setLoadWithOverviewMode(false);
                 webSettings.setLoadWithOverviewMode(true);
@@ -226,7 +275,7 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                 try {
                     JSONArray jsonAccounts = new JSONArray(settings.getString("accounts", "[]"));
                     for (int i = 0; i < jsonAccounts.length(); i++) {
-                        Account account =Account.fromJson(jsonAccounts.getJSONObject(i));
+                        Account account = Account.fromJson(jsonAccounts.getJSONObject(i));
                         if (account.getId() == selectedAccountId) {
                             activeAccount = account;
                             break;
@@ -234,7 +283,7 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                     }
 
                     // Reload webview
-                    loadWebview(Config.WARQUEST_URL + "/");
+                    webviewLoadBaseUrl();
                 }
 
                 // When there is an error reading the accounts json create a new account
@@ -242,17 +291,16 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
                     exception.printStackTrace();
 
                     // Do register request and save and open
-                    new FetchDataTask(this, Config.WARQUEST_URL + "/api/auth/register?key=" + Config.WARQUEST_API_KEY, false, false, this);
+                    FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then(saveAndOpenFirstAccount);
                 }
             }
 
             // Recreate when language or theme change
             if (oldLanguage != -1 && oldTheme != -1) {
                 if (
-                    oldLanguage != settings.getInt("language", SettingsActivity.LANGUAGE_DEFAULT) ||
-                    oldTheme != settings.getInt("theme", SettingsActivity.THEME_DEFAULT)
+                    oldLanguage != settings.getInt("language", Config.SETTINGS_LANGUAGE_DEFAULT) ||
+                    oldTheme != settings.getInt("theme", Config.SETTINGS_THEME_DEFAULT)
                 ) {
-                    Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(() -> {
                         recreate();
                     });
@@ -261,14 +309,29 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
         }
     }
 
-    // Clear webview history on pause
-    public void onPause() {
-        super.onPause();
-        webview.clearHistory();
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.getAction() == Intent.ACTION_VIEW) {
+            webviewLoadUrl(intent.getDataString());
+        }
     }
 
-    // Do webview back when back button is pressed
     public void onBackPressed() {
+        if (disconnectedPage.getVisibility() == View.VISIBLE) {
+            super.onBackPressed();
+        }
+
+        if (
+            webviewTitle.startsWith("WarQuest - Overview") ||
+            webviewTitle.startsWith("WarQuest - Overzicht") ||
+            webviewTitle.startsWith("WarQuest - Übersicht") ||
+            webviewTitle.startsWith("WarQuest - Riepilogo") ||
+            webviewTitle.startsWith("WarQuest - privire generala") ||
+            webviewTitle.startsWith("WarQuest - Resumen")
+        ) {
+            super.onBackPressed();
+        }
+
         if (webview.canGoBack()) {
             webview.goBack();
         } else {
@@ -276,48 +339,22 @@ public class MainActivity extends BaseActivity implements FetchDataTask.OnLoadLi
         }
     }
 
-    // Create a new account and open the webview onload
-    public void onLoad(String response) {
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            if (jsonResponse.getBoolean("success")) {
-                // Set the active account
-                activeAccount = Account.fromJsonApiResponse(jsonResponse);
-
-                // Add account to json accounts
-                JSONArray jsonAccounts = new JSONArray();
-                jsonAccounts.put(activeAccount.toJson());
-
-                // Save data
-                SharedPreferences.Editor settingsEditor = settings.edit();
-                settingsEditor.putString("accounts", jsonAccounts.toString());
-                settingsEditor.putLong("selected_account_id", activeAccount.getId());
-                settingsEditor.apply();
-
-                // Reload the webview
-                loadWebview(Config.WARQUEST_URL + "/");
-
-                // Remove old settings when we where converting
-                SharedPreferences oldSettings = getOldSettings();
-                if (oldSettings.contains("username")) {
-                    SharedPreferences.Editor oldSettingsEditor = oldSettings.edit();
-                    oldSettingsEditor.clear();
-                    oldSettingsEditor.apply();
-                }
-
-                return;
-            }
-        } catch (Exception exception) {
-            exception.printStackTrace();
+    private void webviewLoadBaseUrl() {
+        Intent intent = getIntent();
+        if (intent.getAction() == Intent.ACTION_VIEW) {
+            webviewLoadUrl(intent.getDataString());
+        } else {
+            webviewLoadUrl(Config.APP_WARQUEST_URL + "/");
         }
 
-        // When an error occurt or success is false show an error message
-        Toast.makeText(this, getResources().getString(R.string.register_error_message), Toast.LENGTH_SHORT).show();
+        if (!isRatingAlertUpdated) {
+            isRatingAlertUpdated = true;
+            RatingAlert.updateAndShow(this);
+        }
     }
 
-    // Load url in webview
-    private void loadWebview(String url) {
-        HashMap<String, String> headers = new HashMap<String, String>();
+    private void webviewLoadUrl(String url) {
+        Map<String, String> headers = new HashMap<String, String>();
         headers.put("eid", "1");
         headers.put("username", activeAccount.getUsername());
         headers.put("password", activeAccount.getPassword());

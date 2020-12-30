@@ -1,56 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="main_disconnected_header">Verbinding verbroken</string>
-    <string name="main_disconnected_message">Kan geen verbinding maken met de WarQuest-server, waarschijnlijk omdat u geen internetverbinding heeft, maak weer verbinding met internet om deze app weer te gebruiken</string>
-    <string name="main_disconnected_refresh_button">Herladen</string>
+    <!-- Main activity -->
+    <string name="main_disconnected_title_label">Verbinding verbroken</string>
+    <string name="main_disconnected_description_label">Kan geen verbinding maken met de WarQuest-server, waarschijnlijk omdat u geen internetverbinding heeft, maak weer verbinding met internet om deze app weer te gebruiken</string>
+    <string name="main_disconnected_hero_button">Pagina herladen</string>
 
-    <string name="register_error_message">Kan geen verbinding maken met de WarQuest server</string>
+    <string name="main_error_message">Kan geen verbinding maken met de WarQuest server</string>
 
-    <string name="rating_alert_title">Beoordeel WarQuest?</string>
-    <string name="rating_alert_message_label">Als je de WarQuest-app leuk vindt, neem dan even de tijd om deze te beoordelen. Bedankt voor je steun!</string>
-    <string name="rating_alert_rate_button">Beoordeel</string>
-    <string name="rating_alert_later_button">Later</string>
-    <string name="rating_alert_never_button">Nooit</string>
+    <!-- Settings activity -->
+    <string name="settings_title_label">Instellingen</string>
 
-    <string name="settings_header_title">Instellingen</string>
-    <string name="settings_accounts_subtitle">Account Verwisselaar</string>
-    <string name="settings_add_account_button">Voeg een bestaand WarQuest-account toe</string>
+    <string name="settings_accounts_label">Accounts</string>
+    <string name="settings_login_account_button">Login met een bestaand WarQuest-account</string>
     <string name="settings_create_account_button">Maak een nieuw WarQuest-account aan</string>
-    <string name="settings_other_subtitle">Andere Instellingen</string>
-    <string name="settings_language_label">Taal</string>
-    <string name="settings_theme_label">Thema</string>
-    <string name="settings_cancel">Annuleren</string>
-    <string name="settings_zoom_label">Zoom inschakelen</string>
-    <string name="settings_about_button">Deze applicatie is gemaakt door Bastiaan van der Plaat maar WarQuest is gemaakt door Willem van der Plaat</string>
-    <string name="settings_update_error_message">Kan geen verbinding maken met de WarQuest server</string>
 
-    <string name="settings_remove_alert_title">Account verwijderen?</string>
-    <string name="settings_remove_alert_message_label">Weet u zeker dat u dit account wilt verwijderen?</string>
-    <string name="settings_remove_alert_remove_button">Verwijder</string>
-    <string name="settings_remove_alert_cancel_button">Annuleer</string>
+    <string name="settings_create_alert_title_label">Account aanmaken?</string>
+    <string name="settings_create_alert_message_label">Weet u zeker dat u een niew WarQuest-account wilt aanmaken?</string>
+    <string name="settings_create_alert_create_button">Aanmaken</string>
+    <string name="settings_create_alert_cancel_button">Annuleren</string>
 
-    <string name="account_info_label">Nivo: %1$d - Erv.: %2$s</string>
+    <string name="settings_display_label">Weergave</string>
 
-    <string name="login_header_title">Inloggen</string>
-    <string name="login_info_label">Voer de gebruikersnaam en het wachtwoord van uw WarQuest-account in om deze aan de lijst toe te voegen en in de app te gebruiken:</string>
-    <string name="login_username_label">Login gebruikersnaam</string>
-    <string name="login_password_label">Login wachtwoord</string>
-    <string name="login_login_button">Inloggen</string>
-    <string name="login_create_label">Als u geen account heeft of als u een nieuwe wilt aanmaken, drukt u dan op de aanmaak-knop op de vorige pagina</string>
-    <string name="login_failed_message">Verkeerde gebruikersnaam en / of wachtwoord</string>
-    <string name="login_banned_message">Deze speler is verbannen</string>
-    <string name="login_error_message">Kan geen verbinding maken met de WarQuest server</string>
+    <string name="settings_language_button">Taal</string>
+    <string name="settings_language_alert_title_label">Taal</string>
+    <string name="settings_language_alert_cancel_button">Annuleren</string>
 
+    <string name="settings_theme_button">Thema</string>
+    <string name="settings_theme_alert_title_label">Thema</string>
+    <string name="settings_theme_alert_cancel_button">Annuleren</string>
 
-    <string-array name="languages">
+    <string name="settings_zoom_button">Zoom inschakelen</string>
+
+    <string name="settings_information_label">Informatie</string>
+    <string name="settings_version_button">App versie</string>
+    <string name="settings_version_message">Who, jij bent een geweldige hacker!</string>
+    <string name="settings_rate_button">Beoordeel deze app</string>
+    <string name="settings_share_button">Deel deze app</string>
+    <string name="settings_share_message">Bekijk deze coole Android game:</string>
+    <string name="settings_about_button">Over deze app</string>
+    <string name="settings_footer_button">Deze applicatie is gemaakt door Bastiaan van der Plaat maar WarQuest is gemaakt door Willem van der Plaat</string>
+
+    <string name="settings_about_alert_title_label">Over deze app</string>
+    <string name="settings_about_alert_message_label">Deze applicatie is gemaakt door Bastiaan van der Plaat maar WarQuest is gemaakt door Willem van der Plaat</string>
+    <string name="settings_about_alert_website_button">Website</string>
+    <string name="settings_about_alert_ok_button">OK</string>
+
+    <string name="settings_error_message">Kan geen verbinding maken met de WarQuest server</string>
+
+    <string-array name="settings_languages">
         <item>English</item>
         <item>Nederlands</item>
         <item>Gebruik systeemstandaard</item>
     </string-array>
 
-    <string-array name="themes">
+    <string-array name="settings_themes">
         <item>Licht</item>
         <item>Donker</item>
         <item>Ingesteld door batterijbesparing</item>
     </string-array>
+
+    <!-- Account item -->
+    <string name="account_info_label">Nivo: %1$d - Erv.: %2$s</string>
+
+    <string name="account_remove_alert_title_label">Account verwijderen?</string>
+    <string name="account_remove_alert_message_label">Weet u zeker dat u dit account wilt verwijderen?</string>
+    <string name="account_remove_alert_remove_button">Verwijderen</string>
+    <string name="account_remove_alert_cancel_button">Annuleren</string>
+
+    <!-- Login activity -->
+    <string name="login_title_label">Inloggen</string>
+    <string name="login_info_label">Voer de gebruikersnaam en het wachtwoord van uw WarQuest-account in om deze aan de lijst toe te voegen en in de app te gebruiken:</string>
+    <string name="login_username_label">Login gebruikersnaam</string>
+    <string name="login_password_label">Login wachtwoord</string>
+    <string name="login_login_button">Inloggen</string>
+    <string name="login_footer_label">Als u geen account heeft of als u een nieuwe wilt aanmaken, drukt u dan op de aanmaak-knop op de vorige pagina</string>
+
+    <string name="login_failed_message">Verkeerde gebruikersnaam en / of wachtwoord</string>
+    <string name="login_banned_message">Deze speler is verbannen</string>
+    <string name="login_error_message">Kan geen verbinding maken met de WarQuest server</string>
+
+    <!-- Rating alert -->
+    <string name="rating_alert_title_label">Beoordeel WarQuest?</string>
+    <string name="rating_alert_message_label">Als je de WarQuest-app leuk vindt, neem dan even de tijd om deze te beoordelen. Bedankt voor je steun!</string>
+    <string name="rating_alert_rate_button">Beoordeel</string>
+    <string name="rating_alert_later_button">Later</string>
+    <string name="rating_alert_never_button">Nooit</string>
 </resources>

@@ -20,83 +20,131 @@ public class FetchDataTask {
         public abstract void onLoad(String data);
     }
 
+    public static interface OnErrorListener {
+        public abstract void onError(Exception exception);
+    }
+
     private final Context context;
-    private final String url;
-    private final boolean loadFomCache;
-    private final boolean saveToCache;
-    private final OnLoadListener onLoadListener;
-    private boolean finished;
-    private boolean canceled;
 
-    public FetchDataTask(Context context, String url, boolean loadFomCache, boolean saveToCache, OnLoadListener onLoadListener) {
+    private String url;
+    private boolean isLoadedFomCache = false;
+    private boolean isSavedToCache = false;
+    private OnLoadListener onLoadListener = null;
+    private OnErrorListener onErrorListener = null;
+
+    private boolean isCanceled = false;
+    private boolean isFinished = false;
+
+    private FetchDataTask(Context context) {
         this.context = context;
-        this.url = url;
-        this.loadFomCache = loadFomCache;
-        this.saveToCache = saveToCache;
-        this.onLoadListener = onLoadListener;
-        finished = false;
-        canceled = false;
+    }
 
+    public static FetchDataTask with(Context context) {
+        return new FetchDataTask(context);
+    }
+
+    public FetchDataTask load(String url) {
+        this.url = url;
+        return this;
+    }
+
+    public FetchDataTask withCache() {
+        this.isLoadedFomCache = true;
+        this.isSavedToCache = true;
+        return this;
+    }
+
+    public FetchDataTask fromCache() {
+        this.isLoadedFomCache = true;
+        return this;
+    }
+
+    public FetchDataTask toCache() {
+        this.isSavedToCache = true;
+        return this;
+    }
+
+    public FetchDataTask then(OnLoadListener onLoadListener) {
+        this.onLoadListener = onLoadListener;
+        return fetch();
+    }
+
+    public FetchDataTask then(OnLoadListener onLoadListener, OnErrorListener onErrorListener) {
+        this.onLoadListener = onLoadListener;
+        this.onErrorListener = onErrorListener;
+        return fetch();
+    }
+
+    public FetchDataTask fetch() {
         executor.execute(() -> {
-            String data = fetchData();
-            if (!canceled) {
+            try {
+                String data = fetchData();
                 handler.post(() -> {
-                    finished = true;
-                    if (onLoadListener != null) {
+                    isFinished = true;
+                    if (!isCanceled && onLoadListener != null) {
                         onLoadListener.onLoad(data);
+                    }
+                });
+            } catch (Exception exception) {
+                handler.post(() -> {
+                    isFinished = true;
+                    if (!isCanceled) {
+                        if (onErrorListener != null) {
+                            onErrorListener.onError(exception);
+                        } else {
+                            exception.printStackTrace();
+                        }
                     }
                 });
             }
         });
-    }
-
-    public boolean isFinished() {
-        return finished;
+        return this;
     }
 
     public boolean isCanceled() {
-        return canceled;
+        return isCanceled;
+    }
+
+    public boolean isFinished() {
+        return isFinished;
     }
 
     public void cancel() {
-        canceled = true;
+        isCanceled = true;
+        isFinished = true;
     }
 
-    private String fetchData() {
-        try {
-            File file = new File(context.getCacheDir(), Utils.md5(url));
-            if (loadFomCache && file.exists()) {
-                BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-                StringBuilder stringBuilder = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(line);
-                    stringBuilder.append(System.lineSeparator());
-                }
-                bufferedReader.close();
-                return stringBuilder.toString();
-            }
-
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+    private String fetchData() throws Exception {
+        // Check if the url is already cached
+        File file = new File(context.getCacheDir(), Utils.md5(url));
+        if (isLoadedFomCache && file.exists()) {
+            // Then read the cached file
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
             StringBuilder stringBuilder = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line);
-                stringBuilder.append(System.lineSeparator());
+                stringBuilder.append(line).append(System.lineSeparator());
             }
             bufferedReader.close();
+            return stringBuilder.toString();
+        }
 
-            String data = stringBuilder.toString();
-            if (saveToCache) {
-                FileWriter fileWriter = new FileWriter(file);
-                fileWriter.write(data);
-                fileWriter.close();
-            }
-            return data;
+        // Or fetch the data from the internet
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+        StringBuilder stringBuilder = new StringBuilder();
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            stringBuilder.append(line).append(System.lineSeparator());
         }
-        catch (Exception exception) {
-            exception.printStackTrace();
-            return null;
+        bufferedReader.close();
+
+        // And write to a cache file when needed
+        String data = stringBuilder.toString();
+        if (isSavedToCache) {
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(data);
+            fileWriter.close();
         }
+        return data;
     }
 }

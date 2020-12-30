@@ -3,7 +3,6 @@ package nl.plaatsoft.warquest3;
 import java.io.Serializable;
 import org.json.JSONObject;
 
-// The account data class
 public class Account implements Serializable {
     private static final long serialVersionUID = 1;
 

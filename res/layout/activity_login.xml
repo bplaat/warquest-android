@@ -1,80 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    style="@style/Root">
 
-    <LinearLayout android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/primary_color"
-        android:elevation="4dp">
+    <LinearLayout style="@style/ActionBar">
+        <ImageButton android:id="@+id/login_back_button"
+            android:src="@drawable/ic_arrow_left"
+            style="@style/ActionBarIconButton" />
 
-        <ImageView android:id="@+id/login_back_button"
-            android:src="@drawable/ic_arrow_back"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:scaleType="center" />
-
-        <TextView android:text="@string/login_header_title"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="20sp" />
+        <TextView android:text="@string/login_title_label"
+            style="@style/ActionBarTitle" />
     </LinearLayout>
 
-    <ScrollView android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+    <ScrollView android:id="@+id/login_scroll"
+        style="@style/ScrollContainer">
 
-        <LinearLayout android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="16dp">
-
+        <LinearLayout style="@style/Form">
             <TextView android:text="@string/login_info_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:lineSpacingMultiplier="1.2" />
+                style="@style/FormInfo" />
 
-            <TextView android:text="@string/login_username_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/secondary_text_color" />
+            <LinearLayout style="@style/FormField">
+                <TextView android:text="@string/login_username_label"
+                    style="@style/FormLabel" />
 
-            <EditText android:id="@+id/login_username_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:layout_marginBottom="8dp" />
+                <EditText android:id="@+id/login_username_input"
+                    android:inputType="text"
+                    style="@style/FormInput">
 
-            <TextView android:text="@string/login_password_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/secondary_text_color" />
+                    <requestFocus />
+                </EditText>
+            </LinearLayout>
 
-            <EditText android:id="@+id/login_password_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:layout_marginBottom="8dp" />
+            <LinearLayout style="@style/FormField">
+                <TextView android:text="@string/login_password_label"
+                    style="@style/FormLabel" />
 
-            <Button android:id="@+id/login_login_button"
-                android:text="@string/login_login_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp" />
+                <EditText android:id="@+id/login_password_input"
+                    android:inputType="textPassword"
+                    style="@style/FormInput" />
+            </LinearLayout>
 
-            <TextView android:text="@string/login_create_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/secondary_text_color"
-                android:lineSpacingMultiplier="1.2"
-                android:gravity="center" />
+            <LinearLayout style="@style/FormField">
+                <Button android:id="@+id/login_login_button"
+                    android:text="@string/login_login_button"
+                    style="@style/FormButton" />
+            </LinearLayout>
+
+            <TextView android:text="@string/login_footer_label"
+                style="@style/FormFooter" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -3,21 +3,30 @@ package nl.plaatsoft.warquest3;
 public class Config {
     private Config() {}
 
-    // The WarQuest root url
-    public static final String WARQUEST_URL = "https://warquest.plaatsoft.nl";
+    public static final String APP_OVERRIDE_STORE_PAGE_URL = null;
+    public static final String APP_WARQUEST_URL = "https://warquest.plaatsoft.nl";
+    public static final String APP_WARQUEST_API_KEY = "";
+    public static final String APP_GRAVATAR_URL = "https://www.gravatar.com";
 
-    // The WarQuest API url (enter your own)
-    public static final String WARQUEST_API_KEY = "";
+    public static final int ANIMATION_DURATION = 200;
+    public static final int ANIMATION_IMAGE_LOADING_TIMEOUT = 50;
 
-    // The Gravatar service url
-    public static final String GRAVATAR_URL = "https://www.gravatar.com/avatar/";
+    public static final int SETTINGS_ACCOUNTS_UPDATE_TIMEOUT = 30 * 1000;
 
-    // The accounts list update timeout (in ms)
-    public static final int ACCOUNTS_UPDATE_TIMEOUT = 30 * 1000;
+    public static final boolean SETTINGS_ZOOM_DEFAULT = true;
 
-    // The rating alert launches until prompt
+    public static final int SETTINGS_LANGUAGE_ENGLISH = 0;
+    public static final int SETTINGS_LANGUAGE_DUTCH = 1;
+    public static final int SETTINGS_LANGUAGE_SYSTEM = 2;
+    public static final int SETTINGS_LANGUAGE_DEFAULT = Config.SETTINGS_LANGUAGE_SYSTEM;
+
+    public static final int SETTINGS_THEME_LIGHT = 0;
+    public static final int SETTINGS_THEME_DARK = 1;
+    public static final int SETTINGS_THEME_SYSTEM = 2;
+    public static final int SETTINGS_THEME_DEFAULT = Config.SETTINGS_THEME_DARK;
+
+    public static final String SETTINGS_ABOUT_WEBSITE_URL = "https://bastiaan.ml/";
+
     public static final int RATING_ALERT_LAUNCHES_UNTIL_PROMPT = 5;
-
-    // The rating alert time until prompt (in ms)
     public static final int RATING_ALERT_TIME_UNTIL_PROMPT = 2 * 24 * 60 * 60 * 1000;
 }
