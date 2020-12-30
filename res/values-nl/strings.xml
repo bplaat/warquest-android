@@ -5,7 +5,8 @@
     <string name="main_disconnected_description_label">Kan geen verbinding maken met de WarQuest-server, waarschijnlijk omdat u geen internetverbinding heeft, maak weer verbinding met internet om deze app weer te gebruiken</string>
     <string name="main_disconnected_hero_button">Pagina herladen</string>
 
-    <string name="main_error_message">Kan geen verbinding maken met de WarQuest server</string>
+    <string name="main_connection_error_message">Kan geen verbinding maken met de WarQuest server</string>
+    <string name="main_response_error_message">Kan de reactie van de WarQuest-server niet verwerken</string>
 
     <!-- Settings activity -->
     <string name="settings_title_label">Instellingen</string>
@@ -36,7 +37,7 @@
     <string name="settings_version_message">Who, jij bent een geweldige hacker!</string>
     <string name="settings_rate_button">Beoordeel deze app</string>
     <string name="settings_share_button">Deel deze app</string>
-    <string name="settings_share_message">Bekijk deze coole Android game:</string>
+    <string name="settings_share_message">Bekijk deze coole Android app:</string>
     <string name="settings_about_button">Over deze app</string>
     <string name="settings_footer_button">Deze applicatie is gemaakt door Bastiaan van der Plaat maar WarQuest is gemaakt door Willem van der Plaat</string>
 
@@ -45,7 +46,8 @@
     <string name="settings_about_alert_website_button">Website</string>
     <string name="settings_about_alert_ok_button">OK</string>
 
-    <string name="settings_error_message">Kan geen verbinding maken met de WarQuest server</string>
+    <string name="settings_connection_error_message">Kan geen verbinding maken met de WarQuest server</string>
+    <string name="settings_response_error_message">Kan de reactie van de WarQuest-server niet verwerken</string>
 
     <string-array name="settings_languages">
         <item>English</item>
@@ -75,9 +77,10 @@
     <string name="login_login_button">Inloggen</string>
     <string name="login_footer_label">Als u geen account heeft of als u een nieuwe wilt aanmaken, drukt u dan op de aanmaak-knop op de vorige pagina</string>
 
-    <string name="login_failed_message">Verkeerde gebruikersnaam en / of wachtwoord</string>
-    <string name="login_banned_message">Deze speler is verbannen</string>
-    <string name="login_error_message">Kan geen verbinding maken met de WarQuest server</string>
+    <string name="login_failed_error_message">Verkeerde gebruikersnaam en / of wachtwoord</string>
+    <string name="login_banned_error_message">Deze speler is verbannen</string>
+    <string name="login_connection_error_message">Kan geen verbinding maken met de WarQuest server</string>
+    <string name="login_response_error_message">Kan de reactie van de WarQuest-server niet verwerken</string>
 
     <!-- Rating alert -->
     <string name="rating_alert_title_label">Beoordeel WarQuest?</string>

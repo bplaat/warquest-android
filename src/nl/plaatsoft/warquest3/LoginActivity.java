@@ -51,21 +51,21 @@ public class LoginActivity extends BaseActivity {
 
                     // Show message when banned
                     else if (jsonResponse.getBoolean("banned")) {
-                        Toast.makeText(this, getResources().getString(R.string.login_banned_message), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getResources().getString(R.string.login_banned_error_message), Toast.LENGTH_SHORT).show();
                     }
 
                     // Show message when username and / or password is wrong
                     else {
-                        Toast.makeText(this, getResources().getString(R.string.login_failed_message), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getResources().getString(R.string.login_failed_error_message), Toast.LENGTH_SHORT).show();
                     }
                 }
-
-                // Show toast when request failed
                 catch (Exception exception) {
-                    exception.printStackTrace();
-
-                    Toast.makeText(this, getResources().getString(R.string.login_error_message), Toast.LENGTH_SHORT).show();
+                    // Show message when response json parse failed
+                    Toast.makeText(this, getResources().getString(R.string.login_response_error_message), Toast.LENGTH_SHORT).show();
                 }
+            }, (Exception exception) -> {
+                // Show message when connection error occurt
+                Toast.makeText(this, getResources().getString(R.string.login_connection_error_message), Toast.LENGTH_SHORT).show();
             });
         });
     }

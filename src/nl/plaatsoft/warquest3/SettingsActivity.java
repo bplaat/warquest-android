@@ -97,12 +97,14 @@ public class SettingsActivity extends BaseActivity {
                                 openAccount(account);
                                 return;
                             }
-                        } catch (Exception exception) {
-                            exception.printStackTrace();
                         }
-
-                        // When an error occurt or success is false show an error message
-                        Toast.makeText(this, getResources().getString(R.string.settings_error_message), Toast.LENGTH_SHORT).show();
+                        catch (Exception exception) {
+                            // Show message when response json parse failed
+                            Toast.makeText(this, getResources().getString(R.string.settings_response_error_message), Toast.LENGTH_SHORT).show();
+                        }
+                    }, (Exception exception) -> {
+                        // Show message when connection error occurt
+                        Toast.makeText(this, getResources().getString(R.string.settings_connection_error_message), Toast.LENGTH_SHORT).show();
                     });
                 })
                 .setNegativeButton(R.string.settings_create_alert_cancel_button, null)
@@ -285,12 +287,14 @@ public class SettingsActivity extends BaseActivity {
                     settingsEditor.apply();
                     return;
                 }
-            } catch (Exception exception) {
-                exception.printStackTrace();
             }
-
-            // When an load error occurt or success is false show update error toast
-            Toast.makeText(this, getResources().getString(R.string.settings_error_message), Toast.LENGTH_SHORT).show();
+            catch (Exception exception) {
+                // Show message when response json parse failed
+                Toast.makeText(this, getResources().getString(R.string.settings_response_error_message), Toast.LENGTH_SHORT).show();
+            }
+        }, (Exception exception) -> {
+            // Show message when connection error occurt
+            Toast.makeText(this, getResources().getString(R.string.settings_connection_error_message), Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -373,12 +377,14 @@ public class SettingsActivity extends BaseActivity {
                                 selectAccount(otherAccount);
                                 return;
                             }
-                        } catch (Exception exception) {
-                            exception.printStackTrace();
                         }
-
-                        // When an error occurt or success is false show an error message
-                        Toast.makeText(this, getResources().getString(R.string.settings_error_message), Toast.LENGTH_SHORT).show();
+                        catch (Exception exception) {
+                            // Show message when response json parse failed
+                            Toast.makeText(this, getResources().getString(R.string.settings_response_error_message), Toast.LENGTH_SHORT).show();
+                        }
+                    }, (Exception exception) -> {
+                        // Show message when connection error occurt
+                        Toast.makeText(this, getResources().getString(R.string.settings_connection_error_message), Toast.LENGTH_SHORT).show();
                     });
                 }
 

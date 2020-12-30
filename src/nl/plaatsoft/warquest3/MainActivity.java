@@ -38,6 +38,7 @@ public class MainActivity extends BaseActivity {
 
     private Account activeAccount;
     private FetchDataTask.OnLoadListener saveAndOpenFirstAccount;
+    private FetchDataTask.OnErrorListener connectionError;
     private int oldLanguage = -1;
     private int oldTheme = -1;
     private boolean isRatingAlertUpdated = false;
@@ -77,8 +78,7 @@ public class MainActivity extends BaseActivity {
         disconnectedPage = (LinearLayout)findViewById(R.id.main_disconnected_page);
 
         View.OnClickListener refreshOnClick = (View view) -> {
-            // TODO
-            recreate();
+            webviewLoadBaseUrl();
         };
         ((ImageButton)findViewById(R.id.main_disconnected_refresh_button)).setOnClickListener(refreshOnClick);
         ((Button)findViewById(R.id.main_disconnected_hero_button)).setOnClickListener(refreshOnClick);
@@ -178,12 +178,16 @@ public class MainActivity extends BaseActivity {
                     webviewLoadBaseUrl();
                     return;
                 }
-            } catch (Exception exception) {
-                exception.printStackTrace();
             }
+            catch (Exception exception) {
+                // Show message when response json parse failed
+                Toast.makeText(this, getResources().getString(R.string.main_response_error_message), Toast.LENGTH_SHORT).show();
+            }
+        };
 
-            // When an error occurt or success is false show an error message
-            Toast.makeText(this, getResources().getString(R.string.main_error_message), Toast.LENGTH_SHORT).show();
+        connectionError = (Exception exception) -> {
+            // Show message when connection error occurt
+            Toast.makeText(this, getResources().getString(R.string.main_connection_error_message), Toast.LENGTH_SHORT).show();
         };
 
         // Convert old settings to new format
@@ -208,7 +212,7 @@ public class MainActivity extends BaseActivity {
             }
 
             // Do login request and save and open
-            FetchDataTask.with(this).load(url).then(saveAndOpenFirstAccount);
+            FetchDataTask.with(this).load(url).then(saveAndOpenFirstAccount, connectionError);
         }
 
         // When no old account convert
@@ -220,7 +224,7 @@ public class MainActivity extends BaseActivity {
                 // When there are no accounts create new one
                 if (jsonAccounts.length() == 0) {
                     // Do register request and save and open
-                    FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then(saveAndOpenFirstAccount);
+                    FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then(saveAndOpenFirstAccount, connectionError);
                 }
 
                 // Else get selected account and load webview
@@ -250,7 +254,7 @@ public class MainActivity extends BaseActivity {
                 exception.printStackTrace();
 
                 // Do register request and save and open
-                FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then(saveAndOpenFirstAccount);
+                FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then(saveAndOpenFirstAccount, connectionError);
             }
         }
     }
@@ -291,7 +295,7 @@ public class MainActivity extends BaseActivity {
                     exception.printStackTrace();
 
                     // Do register request and save and open
-                    FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then(saveAndOpenFirstAccount);
+                    FetchDataTask.with(this).load(Config.APP_WARQUEST_URL + "/api/auth/register?key=" + Config.APP_WARQUEST_API_KEY).then(saveAndOpenFirstAccount, connectionError);
                 }
             }
 

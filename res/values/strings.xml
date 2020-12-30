@@ -7,7 +7,8 @@
     <string name="main_disconnected_description_label">Can\'t connect to the WarQuest server probably because you don\'t have an internet connection, connect to the internet to use this app again</string>
     <string name="main_disconnected_hero_button">Refresh page</string>
 
-    <string name="main_error_message">Can\'t connect to the WarQuest server</string>
+    <string name="main_connection_error_message">Can\'t connect to the WarQuest server</string>
+    <string name="main_response_error_message">Can\'t process the response off the WarQuest server</string>
 
     <!-- Settings activity -->
     <string name="settings_title_label">Settings</string>
@@ -47,7 +48,8 @@
     <string name="settings_about_alert_website_button">Website</string>
     <string name="settings_about_alert_ok_button">OK</string>
 
-    <string name="settings_error_message">Can\'t connect to the WarQuest server</string>
+    <string name="settings_connection_error_message">Can\'t connect to the WarQuest server</string>
+    <string name="settings_response_error_message">Can\'t process the response off the WarQuest server</string>
 
     <string-array name="settings_languages">
         <item>English</item>
@@ -77,9 +79,10 @@
     <string name="login_login_button">Login</string>
     <string name="login_footer_label">If you don\'t have an account or if you want to create a new account, press then the create button on the previous page</string>
 
-    <string name="login_failed_message">Wrong username and / or password</string>
-    <string name="login_banned_message">This player is banned</string>
-    <string name="login_error_message">Can\'t connect to the WarQuest server</string>
+    <string name="login_failed_error_message">Wrong username and / or password</string>
+    <string name="login_banned_error_message">This player is banned</string>
+    <string name="login_connection_error_message">Can\'t connect to the WarQuest server</string>
+    <string name="login_response_error_message">Can\'t process the response off the WarQuest server</string>
 
     <!-- Rating alert -->
     <string name="rating_alert_title_label">Rate WarQuest?</string>
