@@ -30,20 +30,6 @@
         style="@style/ListItemSubtitle"/>
 
     <LinearLayout style="@style/ListGroup">
-        <!-- Zoom button -->
-        <LinearLayout android:id="@+id/settings_zoom_button"
-            style="@style/ListItemButton">
-
-            <ImageView android:src="@drawable/ic_magnify"
-                style="@style/ListItemButtonIcon" />
-
-            <TextView android:text="@string/settings_zoom_button"
-                style="@style/ListItemButtonLabel" />
-
-            <Switch android:id="@+id/settings_zoom_switch"
-                style="@style/ListItemButtonSwitch" />
-        </LinearLayout>
-
         <!-- Language button -->
         <LinearLayout android:id="@+id/settings_language_button"
             style="@style/ListItemButton">
@@ -70,6 +56,20 @@
 
             <TextView android:id="@+id/settings_theme_label"
                 style="@style/ListItemButtonMeta" />
+        </LinearLayout>
+
+        <!-- Zoom button -->
+        <LinearLayout android:id="@+id/settings_zoom_button"
+            style="@style/ListItemButton">
+
+            <ImageView android:src="@drawable/ic_magnify"
+                style="@style/ListItemButtonIcon" />
+
+            <TextView android:text="@string/settings_zoom_button"
+                style="@style/ListItemButtonLabel" />
+
+            <Switch android:id="@+id/settings_zoom_switch"
+                style="@style/ListItemButtonSwitch" />
         </LinearLayout>
     </LinearLayout>
 

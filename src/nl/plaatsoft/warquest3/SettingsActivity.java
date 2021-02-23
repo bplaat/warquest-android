@@ -111,19 +111,6 @@ public class SettingsActivity extends BaseActivity {
                 .show();
         });
 
-        // Init zoom button
-        Switch zoomSwitch = (Switch)findViewById(R.id.settings_zoom_switch);
-        zoomSwitch.setChecked(settings.getBoolean("zoom", Config.SETTINGS_ZOOM_DEFAULT));
-        zoomSwitch.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked) -> {
-            SharedPreferences.Editor settingsEditor = settings.edit();
-            settingsEditor.putBoolean("zoom", isChecked);
-            settingsEditor.apply();
-        });
-
-        ((LinearLayout)findViewById(R.id.settings_zoom_button)).setOnClickListener((View view) -> {
-            zoomSwitch.toggle();
-        });
-
         // Init language switcher button
         String[] languages = getResources().getStringArray(R.array.settings_languages);
         int language = settings.getInt("language", Config.SETTINGS_LANGUAGE_DEFAULT);
@@ -164,6 +151,19 @@ public class SettingsActivity extends BaseActivity {
                 })
                 .setNegativeButton(R.string.settings_theme_alert_cancel_button, null)
                 .show();
+        });
+
+        // Init zoom button
+        Switch zoomSwitch = (Switch)findViewById(R.id.settings_zoom_switch);
+        zoomSwitch.setChecked(settings.getBoolean("zoom", Config.SETTINGS_ZOOM_DEFAULT));
+        zoomSwitch.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked) -> {
+            SharedPreferences.Editor settingsEditor = settings.edit();
+            settingsEditor.putBoolean("zoom", isChecked);
+            settingsEditor.apply();
+        });
+
+        ((LinearLayout)findViewById(R.id.settings_zoom_button)).setOnClickListener((View view) -> {
+            zoomSwitch.toggle();
         });
 
         // Init version button easter egg
