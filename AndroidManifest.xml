@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nl.plaatsoft.warquest3"
     android:versionCode="24"
-    android:versionName="2.4">
+    android:versionName="2.4-dev">
 
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="30" />
 
@@ -11,7 +11,8 @@
     <application android:allowBackup="true"
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
-        android:theme="@style/Theme.App">
+        android:theme="@style/Theme.App"
+        android:isGame="true">
 
         <activity android:name=".MainActivity"
             android:launchMode="singleTask"
