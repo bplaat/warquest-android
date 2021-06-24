@@ -3,6 +3,7 @@ package nl.plaatsoft.warquest3;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
@@ -58,7 +59,7 @@ public class MainActivity extends BaseActivity {
         webviewPage = (LinearLayout)findViewById(R.id.main_webview_page);
 
         webview = (WebView)findViewById(R.id.main_webview_webview);
-        webview.setBackgroundColor(0);
+        webview.setBackgroundColor(Color.TRANSPARENT);
 
         WebSettings webSettings = webview.getSettings();
         webSettings.setJavaScriptEnabled(true);

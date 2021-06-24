@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Looper;
 import android.os.Handler;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -123,7 +124,7 @@ public class FetchImageTask {
                     finish();
                     if (!isCanceled) {
                         if (imageView != null) {
-                            imageView.setBackgroundColor(0);
+                            imageView.setBackgroundColor(Color.TRANSPARENT);
 
                             boolean isWaitingLong = (System.currentTimeMillis() - startTime) > Config.ANIMATION_IMAGE_LOADING_TIMEOUT;
                             if (isFadedIn && isWaitingLong) {
