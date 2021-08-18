@@ -46,7 +46,9 @@ public class SettingsActivity extends BaseActivity {
 
         // Accounts list item click event
         accountsList.setOnItemClickListener((AdapterView<?> adapterView, View view, int position, long id) -> {
-            openAccount(accountsAdapter.getItem(position - 1));
+            if (position > 0 && position < accountsAdapter.getCount() - 1) {
+                openAccount(accountsAdapter.getItem(position - 1));
+            }
         });
 
         // Accounts list item long press event
