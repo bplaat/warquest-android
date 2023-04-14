@@ -4,11 +4,9 @@
 WarQuest for Android is a free multi player online game (MPOG) featuring a war zone with thousands of players. WarQuest takes you to the year 2020. The world is at war. The goal of the game is to defend your country and conquer others. Buy weapon and production units, play missions, fight, make allies and become the best player of your country. Enter the war zone if you dare!
 
 ## Install the app
-The easiest way to download the app is via the [Google Play Store](https://play.google.com/store/apps/details?id=nl.plaatsoft.warquest3).
+You can download the latest Android app `apk` file from the [release tab](https://github.com/bplaat/warquest-android/releases).
 
-If you don't want to use the Google Play store, you can always download the latest `apk` file from the [release tab](https://github.com/bplaat/warquest-android/releases).
-
-<a href="https://play.google.com/store/apps/details?id=nl.plaatsoft.warquest3"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="200"></a>
+<a href="https://github.com/bplaat/warquest-android/releases"><img alt="Direct APK download" src="docs/direct-apk-download.png" width="200"></a>
 
 ## Screenshots
 Here are some screenshots I took from my phone:
