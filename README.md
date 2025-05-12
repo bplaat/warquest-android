@@ -11,15 +11,15 @@ You can download the latest Android app `apk` file from the [release tab](https:
 ## Screenshots
 Here are some screenshots I took from my phone:
 
-[<img alt="Screenshot 1" src="screenshots/screenshot1_small.png" width="160">](screenshots/screenshot1.png)
-[<img alt="Screenshot 2" src="screenshots/screenshot2_small.png" width="160">](screenshots/screenshot2.png)
-[<img alt="Screenshot 3" src="screenshots/screenshot3_small.png" width="160">](screenshots/screenshot3.png)
-[<img alt="Screenshot 4" src="screenshots/screenshot4_small.png" width="160">](screenshots/screenshot4.png)
+[<img alt="Screenshot 1" src="docs/screenshots/screenshot1_small.png" width="160">](docs/screenshots/screenshot1.png)
+[<img alt="Screenshot 2" src="docs/screenshots/screenshot2_small.png" width="160">](docs/screenshots/screenshot2.png)
+[<img alt="Screenshot 3" src="docs/screenshots/screenshot3_small.png" width="160">](docs/screenshots/screenshot3.png)
+[<img alt="Screenshot 4" src="docs/screenshots/screenshot4_small.png" width="160">](docs/screenshots/screenshot4.png)
 
-[<img alt="Screenshot 5" src="screenshots/screenshot5_small.png" width="160">](screenshots/screenshot5.png)
-[<img alt="Screenshot 6" src="screenshots/screenshot6_small.png" width="160">](screenshots/screenshot6.png)
-[<img alt="Screenshot 7" src="screenshots/screenshot7_small.png" width="160">](screenshots/screenshot7.png)
-[<img alt="Screenshot 8" src="screenshots/screenshot8_small.png" width="160">](screenshots/screenshot8.png)
+[<img alt="Screenshot 5" src="docs/screenshots/screenshot5_small.png" width="160">](docs/screenshots/screenshot5.png)
+[<img alt="Screenshot 6" src="docs/screenshots/screenshot6_small.png" width="160">](docs/screenshots/screenshot6.png)
+[<img alt="Screenshot 7" src="docs/screenshots/screenshot7_small.png" width="160">](docs/screenshots/screenshot7.png)
+[<img alt="Screenshot 8" src="docs/screenshots/screenshot8_small.png" width="160">](docs/screenshots/screenshot8.png)
 
 ## License
 Copyright &copy; 2018 - present Bastiaan van der Plaat
